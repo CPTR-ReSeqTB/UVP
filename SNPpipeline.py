@@ -11,7 +11,7 @@ from datetime import datetime
 
 class snp():
 
-    def __init__(self, input, outdir, reference, name, paired, input2, verbose, argString):
+    def __init__(self, input, outdir, reference, name, paired, include, resloci, input2, verbose, argString):
         self.name = name
         self.fOut1 = "Output"
         self.fOut = self.fOut1 + "/" + outdir
@@ -24,6 +24,8 @@ class snp():
         self.kraken = self.fOut + "/kraken"
         #self.kvarq = self.fOut + "/kvarq"
         self.paired = paired
+        self.include = include
+        self.resloci = resloci
         self.input2 = input2
         self.verbose = verbose
         self.reference = reference
@@ -224,7 +226,7 @@ class snp():
             fields = lines.rstrip("\r\n").split("\t") 
             if fields[5].find("Mycobacterium tuberculosis") != -1:
                cov += float(fields[0])
-        if cov < 95:
+        if cov < 9:
            self.__CallCommand('mv', ['mv', self.input, self.flog])
            self.__logFH.write("not species specific\n")
            i = datetime.now()
@@ -395,9 +397,14 @@ class snp():
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
                                [self.__vcfannotate, '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
-            self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
-                               [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
-                                '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
+            if self.include:
+               self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
+                                  [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
+                                  '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
+            else:
+                self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
+                                   [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
+                                   '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
             self.__CallCommand('mv', ['mv', samDir + '/samtools.mpileup', self.fOut + "/" + self.name + '.mpileup'])
             self.__CallCommand(['samtools depth', samDir + '/coverage.txt'],
                                 ['samtools','depth', self.__finalBam])
@@ -421,7 +428,7 @@ class snp():
            self.__annotation = self.fOut + "/" + self.name +'_annotation.txt'
            self.__ifVerbose("parsing final Annotation.")
            self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Final_annotation.txt'],
-                              ['python', self.__parser, self.__exclusion, self.__annotation])
+                              ['python', self.__parser, self.__annotation])
             
         else:
             self.__ifVerbose("Use SamTools, GATK, or Freebayes to annotate the final VCF.")
@@ -434,7 +441,7 @@ class snp():
                               ['python', self.__lineage_parser, self.__lineages, self.__final_annotation])
     def runCoverage(self):
         """ Run Genome Coverage Statistics """
-        self.__ifVerbose("Genome Coverage Statistics")
+        self.__ifVerbose("Running Genome Coverage Statistics")
         samDir = self.outdir + "/SamTools"
         self.__CallCommand(['coverage estimator', self.fOut + "/" + self.name + '_Coverage.txt'],
                             ['python', self.__coverage_estimator, samDir + '/coverage.txt'])
@@ -445,6 +452,12 @@ class snp():
         """ Clean up the temporary files, and move them to a proper folder. """
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
         self.__CallCommand('rm', ['rm',  self.input])
+        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
+        self.__CallCommand('rm', ['rm',  self.__finalBam])
+        self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
+        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_SamTools.vcf'])
+        self.__CallCommand('rm', ['rm',  self.__finalVCF])
+        
         if self.paired:
            self.__CallCommand('rm', ['rm',  self.input2])
 

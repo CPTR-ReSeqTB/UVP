@@ -80,8 +80,11 @@ if len(prevlin) == 0:
       if discordance:
          print "no precise lineage inferred"
       else:
-         print "Lineage: " + split_first[0] + " :  " + tribes[int(split_first[0])]
-         print "Sub-lineage: " + sublinn
+         if len(split_first) > 1:
+            print "Lineage: " + split_first[0] + " :  " + tribes[int(split_first[0])]
+            print "Sub-lineage: " + sublinn
+         else:
+            print "No Informative SNPs detected"
    elif len(prevsub) == 0:
      if len(linfour) > 2:
          print "SNP" + " " + linfour + "  suggests sublineage 4.9"

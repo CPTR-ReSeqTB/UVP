@@ -5,39 +5,54 @@ import re
 from string import join
 
 input1 = sys.argv[1]
-input2 = sys.argv[2]
-annotation         = ""
-variant            = ""
-read_depth         = ""
-quality            = ""
-perc_alt           = ""
-nucleotide_change  = ""
-transcript_pos     = ""
-amino_acid_change  = ""
-orig_aacid         = ""
-new_aacid	   = ""
-codon_pos	   = ""
-gene_name          = ""
-gene_id            = ""
-transcript         = ""
-annotation_details = ""
-exclusion = []
-
-fh1 = open(input1,'r')
-for lines in fh1:
-    if lines.startswith('Locus'):
-       continue
-    fields = lines.rstrip("\r\n").split("\t")
-    exclusion.append(fields[0])
-fh1.close()
+position            = ""
+reference           = ""
+alternate           = ""
+annotation          = ""
+variant             = ""
+read_depth          = ""
+quality             = ""
+perc_alt            = ""
+nucleotide_change   = ""
+transcript_pos      = ""
+amino_acid_change   = ""
+orig_aacid          = ""
+new_aacid	    = ""
+codon_pos	    = ""
+gene_name           = ""
+gene_id             = ""
+transcript          = ""
+annotation_details  = ""
+position1           = ""
+reference1          = ""
+alternate1          = ""
+annotation1         = ""
+variant1            = ""
+read_depth1         = ""
+quality1            = ""
+perc_alt11          = ""
+nucleotide_change1  = ""
+transcript_pos1     = ""
+amino_acid_change1  = ""
+orig_aacid1         = ""
+new_aacid1	    = ""
+codon_pos1	    = ""
+gene_name1          = ""
+gene_id1            = ""
+transcript1         = ""
+annotation_details1 = ""
+Block               = True
     
-fh2 = open(input2,'r')
+fh1 = open(input1,'r')
 print "CHROM" + "\t" + "POS" + "\t" + "REF" + "\t" + "ALT" + "\t" + "Read Depth" + "\t" + "Quality" + "\t" + "Percent Alt allele" + "\t" +  "Annotation" + "\t" + "Variant Type" + "\t" + "Nucleotide Change" + "\t" + "Position within CDS " + "\t" + "Amino acid change" + "\t" + "REF Amino acid" + "\t" + "ALT Amino Acid" + "\t" + "Codon Position" + "\t" "Gene name" + "\t" + "Gene ID" + "\t" + "Transcript ID" + "\t" + "Annotation details"  
 
-for lines in fh2:
+for lines in fh1:
     if lines.startswith("#"):
        continue
     fields = lines.rstrip("\r\n").split("\t")
+    position = fields[1]
+    reference = fields[3]
+    alternate = fields[4]
     quality = fields[5]
     rarr = fields[9].split(":")
     read_depth = rarr[2]
@@ -66,7 +81,9 @@ for lines in fh2:
        new_aacid	  = 'NA'
        codon_pos	  = 'NA'
        annotation_details = ','.join(subannot[1:])
-       print fields[0] + "\t" + fields[1] + "\t" + fields[3] + "\t" + fields[4] + "\t" + read_depth + "\t" + quality + "\t" + perc_alt + "\t" + annotation + "\t" + variant + "\t" + nucleotide_change + "\t" + transcript_pos + "\t" + amino_acid_change + "\t" + orig_aacid + "\t" + new_aacid + "\t" + codon_pos + "\t" +  gene_name + "\t" + gene_id + "\t" + transcript + "\t" + annotation_details
+       if len(position1) != 0:
+          print  fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + variant1 + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + new_aacid1 + "\t" + codon_pos1 + "\t" +  gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" + annotation_details1
+       
     else:
         
         if smallannot[10][2:5] == smallannot[10][-3:]:
@@ -117,10 +134,36 @@ for lines in fh2:
                new_aacid  = smallannot[10][-3:]
             transcript_pos = re.findall(r'\d+', smallannot[9])[0]
             codon_pos = re.findall(r'\d+', smallannot[10])[0]
-
-        print fields[0] + "\t" + fields[1] + "\t" + fields[3] + "\t" + fields[4] + "\t" + read_depth + "\t" + quality + "\t" + str(perc_alt) + "\t" + annotation + "\t" + variant + "\t" + nucleotide_change + "\t" + transcript_pos + "\t" + amino_acid_change + "\t" + orig_aacid + "\t" + new_aacid + "\t" + codon_pos + "\t" + gene_name + "\t" + gene_id + "\t" + transcript + "\t" + annotation_details
         
- 
-       
+        if len(position1) != 0:
+           if codon_pos == codon_pos1:
+              Block = True   
+              print  fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + variant1 + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + 'Block_Substitution' + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" + annotation_details1
+           elif Block == True:
+              print  fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + variant1 + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + 'Block_Substitution' + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" + annotation_details1
+              Block = False
+           else:   
+              print  fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + variant1 + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + new_aacid1 + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" + annotation_details1 
+           
+    position1           = position
+    reference1          = reference
+    alternate1          = alternate
+    annotation1         = annotation
+    variant1            = variant
+    read_depth1         = read_depth
+    quality1            = quality
+    perc_alt11          = perc_alt
+    nucleotide_change1  = nucleotide_change
+    transcript_pos1     = transcript_pos
+    amino_acid_change1  = amino_acid_change
+    orig_aacid1         = orig_aacid
+    new_aacid1	        = new_aacid
+    codon_pos1	        = codon_pos
+    gene_name1          = gene_name
+    gene_id1            = gene_id
+    transcript1         = transcript
+    annotation_details1 = annotation_details   
+                 
+print  fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + variant1 + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + new_aacid1 + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" + annotation_details1
 
        
