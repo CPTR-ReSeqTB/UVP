@@ -16,7 +16,6 @@ if __name__ == '__main__':
     group1.add_argument('-r', '--reference', required=True, metavar="STRING", help='Reference genome in FASTA format.')
     group1.add_argument('-n', '--name', required=True, metavar="STRING", help='Sample name to be used as a prefix.')
     group1.add_argument('-q2', '--fastq2', default='', metavar="STRING", help='Second paired-end FASTQ file.')
-    group1.add_argument('-l', '--resloci', default='', metavar="STRING", help='Resistance loci coordinate file.')
     group2 = parser.add_argument_group('Output', '')
     group2.add_argument('-o', '--outdir', help='Output directory', metavar="STRING")
     group2.add_argument('--keepfiles', action='store_true', help='Keep intermediate files.')
@@ -62,12 +61,6 @@ if __name__ == '__main__':
             paired = True
     else:
         paired = False
-    
-    # Ascertain for resistance loci file 
-    if args.resloci:
-       include = True
-    else:
-       include = False
 
     # Choose an aligner 
     aligners = 0
@@ -100,7 +93,7 @@ if __name__ == '__main__':
         print ""
         
     # All is well let's get started!
-    s = SNPpipeline.snp(args.fastq, args.outdir, args.reference, args.name, paired, include, args.resloci, args.fastq2, 
+    s = SNPpipeline.snp(args.fastq, args.outdir, args.reference, args.name, paired, args.fastq2, 
                         args.verbose, ' '.join(sys.argv))
     s.runVali()
     s.runKraken()

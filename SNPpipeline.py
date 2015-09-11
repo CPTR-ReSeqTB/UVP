@@ -11,7 +11,7 @@ from datetime import datetime
 
 class snp():
 
-    def __init__(self, input, outdir, reference, name, paired, include, resloci, input2, verbose, argString):
+    def __init__(self, input, outdir, reference, name, paired,input2, verbose, argString):
         self.name = name
         self.fOut1 = "Output"
         self.fOut = self.fOut1 + "/" + outdir
@@ -24,8 +24,6 @@ class snp():
         self.kraken = self.fOut + "/kraken"
         #self.kvarq = self.fOut + "/kvarq"
         self.paired = paired
-        self.include = include
-        self.resloci = resloci
         self.input2 = input2
         self.verbose = verbose
         self.reference = reference
@@ -62,6 +60,8 @@ class snp():
         self.__kraken          = '/scicomp/home/krt7/KRAKEN/kraken'
         self.__krakendb        = '/scicomp/home/krt7/KRAKEN/minikraken'
         self.__krakenreport    = '/scicomp/home/krt7/KRAKEN/kraken-report'
+        self.__pigz            = '/scicomp/home/krt7/binary/pigz'
+        self.__unpigz            = '/scicomp/home/krt7/binary/unpigz'
         
         # Mapping
         self.__bwa      = '/scicomp/home/krt7/binary/bwa'
@@ -91,9 +91,12 @@ class snp():
         self.__lineage_parser = '/scicomp/home/krt7/binary/lineage_parser.py'
         self.__lineages       = '/scicomp/home/krt7/binary/lineage_markers.txt'
         self.__exclusion      = '/scicomp/home/krt7/binary/loci_filtered.txt'
-        self.__excluded      = '/scicomp/home/krt7/binary/excluded_loci.txt'
-        self.__coverage_estimator = '/scicomp/home/krt7/binary/coverage_estimator.py'     
-    
+        self.__excluded       = '/scicomp/home/krt7/binary/excluded_loci.txt'
+        self.__coverage_estimator = '/scicomp/home/krt7/binary/coverage_estimator.py'
+        self.resloci          = '/scicomp/home/krt7/binary/included_loci.txt'
+        self.__bedlist        = '/scicomp/home/krt7/binary/bed_list.txt'     
+        self.__resis_parser   = '/scicomp/home/krt7/binary/resis_parser.py'
+
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
         """ Allows execution of a simple command. """
@@ -137,10 +140,11 @@ class snp():
            output1 = valiOut + "/result1.out"
            output2 = valiOut + "/result2.out"
            self.__CallCommand(['cat', valiOut + "/result.out"], ['cat', output1, output2])
+           self.__CallCommand('rm', ['rm', output1, output2 ])
         else:  
-	   self.__CallCommand(['fastQValidator', valiOut + '/result.out'], [self.__fastqval, '--file', self.input])	
-	output = valiOut + "/result.out"
-        
+	   self.__CallCommand(['fastQValidator', valiOut + '/result.out'], [self.__fastqval, '--file', self.input])
+        self.__CallCommand('mv', ['mv', valiOut + '/result.out', valiOut + '/Validation_report.txt'])	
+	output = valiOut + "/Validation_report.txt"
         fh2 = open (output, 'r')
         for line in fh2:
             lined=line.rstrip("\r\n")
@@ -184,8 +188,8 @@ class snp():
                               '-out_good', self.prinseq + "/" + self.name + "good", 
                               '-out_bad', 'null', '-log', self.prinseq + "/" + self.name + "log"])
         if self.paired:
-           self.__CallCommand('gzip', ['gzip', self.prinseq + "/" + self.name + "good" + "_1.fastq"])
-           self.__CallCommand('gzip', ['gzip', self.prinseq + "/" + self.name + "good" + "_2.fastq"])
+           self.__CallCommand('pigz', [self.__pigz, '-p', '10', self.prinseq + "/" + self.name + "good" + "_1.fastq"])
+           self.__CallCommand('pigz', [self.__pigz, '-p', '10', self.prinseq + "/" + self.name + "good" + "_2.fastq"])
            self.__CallCommand('rm', ['rm', self.prinseq + "/" + self.name + "bad_1.fastq",
                                self.prinseq + "/" + self.name + "bad_2.fastq",
                                self.prinseq + "/" + self.name + "good_1_singletons.fastq",
@@ -194,7 +198,7 @@ class snp():
            self.input  = self.prinseq + "/" + self.name + "good" + "_1.fastq.gz"
            self.input2 = self.prinseq + "/" + self.name + "good" + "_2.fastq.gz"
         else:
-           self.__CallCommand('gzip', ['gzip', self.prinseq + "/" + self.name + "good" + ".fastq"])
+           self.__CallCommand('gzip', [self.__pigz, '-p', '10', self.prinseq + "/" + self.name + "good" + ".fastq"])
            self.__CallCommand('rm', ['rm', self.prinseq + "/" + self.name + "bad.fastq",
                               self.prinseq + "/" + self.name + "good_singletons.fastq",
                               self.prinseq + "/" + self.name + '.fastq'])
@@ -219,14 +223,13 @@ class snp():
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
                                self.__krakendb, self.kraken + "/kraken.txt"])
         krakenOut = self.kraken + "/final_report.txt"
-        
         cov = 0
         fh1 = open(krakenOut,'r')
         for lines in fh1:
             fields = lines.rstrip("\r\n").split("\t") 
             if fields[5].find("Mycobacterium tuberculosis") != -1:
                cov += float(fields[0])
-        if cov < 9:
+        if cov < 90:
            self.__CallCommand('mv', ['mv', self.input, self.flog])
            self.__logFH.write("not species specific\n")
            i = datetime.now()
@@ -272,12 +275,12 @@ class snp():
         """ Make use of bwa mem """
         if self.paired:
             self.__ifVerbose("   Running BWA mem on paired end reads.")
-            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem', '-R', 
+            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem', '-t', '10', '-R', 
                                "@RG\tID:" + self.name + "\tSM:" + self.name + "\tPL:ILLUMINA", 
                                 self.reference, self.input, self.input2])
         else:
             self.__ifVerbose("   Running BWA mem on single end reads.")
-            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem', '-R', 
+            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem', '-t', '10', '-R', 
                                "@RG\tID:" + self.name + "\tSM:" + self.name + "\tPL:ILLUMINA", 
                                 self.reference, self.input])       
     
@@ -306,24 +309,24 @@ class snp():
         self.__ifVerbose("   Running Qualimap.")
         self.__CallCommand('qualimap bamqc', [self.__qualimap, 'bamqc', '-bam', GATKdir +'/GATK_s.bam', '-outdir', self.qualimap])
         self.__ifVerbose("   Running MarkDuplicates.")
-        self.__CallCommand('MarkDuplicates', ['java', '-Xmx4g', '-jar', self.__picard, 'MarkDuplicates',  
+        self.__CallCommand('MarkDuplicates', ['java', '-Xmx8g', '-jar', self.__picard, 'MarkDuplicates',  
                            'INPUT='+ GATKdir +'/GATK_s.bam', 'OUTPUT='+ GATKdir +'/GATK_sd.bam',
                            'METRICS_FILE='+ GATKdir +'/MarkDupes.metrics', 'ASSUME_SORTED=true', 
                            'REMOVE_DUPLICATES=false', 'VALIDATION_STRINGENCY=LENIENT'])         
         self.__ifVerbose("   Running AddOrReplaceReadGroups.")
-        self.__CallCommand('AddOrReplaceReadGroups', ['java', '-Xmx4g', '-jar', self.__picard, 'AddOrReplaceReadGroups', 
+        self.__CallCommand('AddOrReplaceReadGroups', ['java', '-Xmx8g', '-jar', self.__picard, 'AddOrReplaceReadGroups', 
                            'INPUT='+ GATKdir +'/GATK_sd.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
                            'SORT_ORDER=coordinate', 'RGID=GATK', 'RGLB=GATK', 'RGPL=Illumina', 'RGSM=GATK', 
                            'RGPU=GATK', 'VALIDATION_STRINGENCY=LENIENT'])
         self.__ifVerbose("   Running BuildBamIndex.")
-        self.__CallCommand('BuildBamIndex', ['java', '-Xmx4g', '-jar', self.__picard, 'BuildBamIndex',  
+        self.__CallCommand('BuildBamIndex', ['java', '-Xmx8g', '-jar', self.__picard, 'BuildBamIndex',  
                            'INPUT='+ GATKdir +'/GATK_sdr.bam', 'VALIDATION_STRINGENCY=LENIENT'])
 
         """ Re-alignment around InDels using GATK """
         self.__ifVerbose("   Running RealignerTargetCreator.")
-        self.__CallCommand('RealignerTargetCreator', ['java', '-Xmx4g', '-jar', self.__gatk, '-T', 
+        self.__CallCommand('RealignerTargetCreator', ['java', '-Xmx16g', '-jar', self.__gatk, '-T', 
                            'RealignerTargetCreator', '-I', GATKdir +'/GATK_sdr.bam', '-R', self.reference, 
-                           '-o', GATKdir +'/GATK.intervals'])
+                           '-o', GATKdir +'/GATK.intervals', '-nt', '4'])
         self.__ifVerbose("   Running IndelRealigner.")
         self.__CallCommand('IndelRealigner', ['java', '-Xmx4g', '-jar', self.__gatk, '-T', 'IndelRealigner', '-l', 
                            'INFO', '-I', GATKdir +'/GATK_sdr.bam', '-R', self.reference, '-targetIntervals', 
@@ -396,19 +399,20 @@ class snp():
                                [self.__vcfutils, 'varFilter', '-D1500', samDir + '/samtools.vcf'])
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
-                               [self.__vcfannotate, '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
-            if self.include:
-               self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
+                               ['vcf-annotate', '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
+            self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'], 
                                   [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                   '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
-            else:
-                self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
+            self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
                                    [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                    '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
             self.__CallCommand('mv', ['mv', samDir + '/samtools.mpileup', self.fOut + "/" + self.name + '.mpileup'])
             self.__CallCommand(['samtools depth', samDir + '/coverage.txt'],
                                 ['samtools','depth', self.__finalBam])
-                                
+            self.__CallCommand(['bedtools coverage', samDir + '/bed_coverage.txt' ],
+                                ['bedtools','coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
+            self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
+                                ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])                 
             
             """ Set final VCF """
             if not self.__finalVCF: 
@@ -429,6 +433,12 @@ class snp():
            self.__ifVerbose("parsing final Annotation.")
            self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Final_annotation.txt'],
                               ['python', self.__parser, self.__annotation])
+
+           self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_Resistance_annotation.txt'],
+                                ['java', '-Xmx4g', '-jar', self.__annotator, 'NC_000962', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'])
+           self.__ifVerbose("parsing final Annotation.")
+           self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'],
+                              ['python', self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
             
         else:
             self.__ifVerbose("Use SamTools, GATK, or Freebayes to annotate the final VCF.")
@@ -445,21 +455,25 @@ class snp():
         samDir = self.outdir + "/SamTools"
         self.__CallCommand(['coverage estimator', self.fOut + "/" + self.name + '_Coverage.txt'],
                             ['python', self.__coverage_estimator, samDir + '/coverage.txt'])
+        self.__CallCommand(['resistance region coverage estimator', self.fOut + "/" + self.name + '_Resistance_Region_Coverage.txt'],
+                            ['python', self.__resis_parser, samDir + '/bed_sorted_coverage.txt', samDir + '/coverage.txt'])
                             
         
-    
     def cleanUp(self):
         """ Clean up the temporary files, and move them to a proper folder. """
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
         self.__CallCommand('rm', ['rm',  self.input])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
+        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
         self.__CallCommand('rm', ['rm',  self.__finalBam])
         self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
-        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_SamTools.vcf'])
-        self.__CallCommand('rm', ['rm',  self.__finalVCF])
+        self.__CallCommand('rm', ['rm',  self.kraken + "/kraken.txt"])
+       
         
         if self.paired:
            self.__CallCommand('rm', ['rm',  self.input2])
+        valiOut = self.fOut + "/validation"
+        self.__CallCommand('rm', ['rm', '-r', self.prinseq])
 
     def __ifVerbose(self, msg):
         """ If verbose print a given message. """
