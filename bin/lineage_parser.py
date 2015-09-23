@@ -33,16 +33,16 @@ fh1.close()
 fh2 = open(input2,'r')
 for lines in fh2:
     fields = lines.rstrip("\r\n").split("\t")
-    if fields[1] == '1759252':
-       linfour = fields[1]
-    if fields[1] == '2831482':
-       BOV = fields[1]
-    if fields[1] == '1882180':
+    if fields[2] == '1759252':
+       linfour = fields[2]
+    if fields[2] == '2831482':
+       BOV = fields[2]
+    if fields[2] == '1882180':
        BOV_AFRI = '1882180'
        
-    if fields[1] in position:
-       ind = position.index(fields[1])
-       if alt[ind] == fields[3]:
+    if fields[2] in position:
+       ind = position.index(fields[2])
+       if alt[ind] == fields[4]:
           if len(lineage[ind]) > 1:
              sublin = lineage[ind]
              prevsub.append(sublin)
