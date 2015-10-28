@@ -54,49 +54,43 @@ class snp():
         self.__logged = True
 				
 	# Format Validation
-	self.__fastqval        = '/scicomp/home/krt7/binary/fastQValidator'
+	self.__fastqval          = '/binary/fastQValidator'
 
         #fastq QC
-        self.__prinseq         = '/scicomp/home/krt7/binary/prinseq-lite.pl'
-        self.__kraken          = '/scicomp/home/krt7/KRAKEN/kraken'
-        self.__krakendb        = '/scicomp/home/krt7/KRAKEN/minikraken'
-        self.__krakenreport    = '/scicomp/home/krt7/KRAKEN/kraken-report'
-        self.__pigz            = '/scicomp/home/krt7/binary/pigz'
-        self.__unpigz            = '/scicomp/home/krt7/binary/unpigz'
+        self.__prinseq           = '/binary/prinseq-lite.pl'
+        self.__kraken            = '/KRAKEN/kraken'
+        self.__krakendb          = '/KRAKEN/minikraken'
+        self.__krakenreport      = '/KRAKEN/kraken-report'
+        self.__pigz              = '/binary/pigz'
+        self.__unpigz            = '/binary/unpigz'
         
         # Mapping
-        self.__bwa      = '/scicomp/home/krt7/binary/bwa'
-        self.__samtools = '/scicomp/home/krt7/binary/samtools/samtools'
-        self.__qualimap = '/scicomp/home/krt7/binary/qualimap_v2.1.1/qualimap'
+        self.__bwa      = '/binary/bwa'
+        self.__samtools = '/binary/samtools/samtools'
+        self.__qualimap = '/binary/qualimap_v2.1.1/qualimap'
 
 
         # Picard-Tools
-        self.__picard     = '/scicomp/home/krt7/binary/picard/picard.jar'
-        self.__sortsam    = '/usr/local/bin/SortSam.jar'
-        self.__samformat  = '/usr/local/bin/SamFormatConverter.jar'
-        self.__readgroups = '/usr/local/bin/AddOrReplaceReadGroups.jar'
-        self.__bamindex   = '/usr/local/bin/BuildBamIndex.jar'
-        self.__seqdiction = '/usr/local/bin/CreateSequenceDictionary.jar'
-        self.__markdupes  = '/usr/local/bin/MarkDuplicates.jar'
+        self.__picard     = '/binary/picard/picard.jar'
 
         # SNP / InDel Calling
-        self.__gatk = '/scicomp/home/krt7/binary/GenomeAnalysisTK.jar'
+        self.__gatk = '/binary/GenomeAnalysisTK.jar'
         
         # Other
-        self.__bcftools       = '/scicomp/home/krt7/binary/bcftools/bcftools'
-        self.__vcfannotate    = '/scicomp/home/krt7/binary/vcftools/bin/vcf-annotate'
-        self.__vcftools       = '/scicomp/home/krt7/binary/vcftools/bin/vcftools'
-        self.__vcfutils       = '/scicomp/home/krt7/binary/bcftools/vcfutils.pl' 
-        self.__annotator      = '/scicomp/home/krt7/binary/snpEff/snpEff.jar' 
-        self.__parser         = '/scicomp/home/krt7/binary/parse_annotation.py'
-        self.__lineage_parser = '/scicomp/home/krt7/binary/lineage_parser.py'
-        self.__lineages       = '/scicomp/home/krt7/binary/lineage_markers.txt'
-        self.__exclusion      = '/scicomp/home/krt7/binary/loci_filtered.txt'
-        self.__excluded       = '/scicomp/home/krt7/binary/excluded_loci.txt'
-        self.__coverage_estimator = '/scicomp/home/krt7/binary/coverage_estimator.py'
-        self.resloci          = '/scicomp/home/krt7/binary/included_loci.txt'
-        self.__bedlist        = '/scicomp/home/krt7/binary/bed_list.txt'     
-        self.__resis_parser   = '/scicomp/home/krt7/binary/resis_parser.py'
+        self.__bcftools       = '/binary/bcftools/bcftools'
+        self.__vcfannotate    = '/binary/vcftools/bin/vcf-annotate'
+        self.__vcftools       = '/binary/vcftools/bin/vcftools'
+        self.__vcfutils       = '/binary/bcftools/vcfutils.pl' 
+        self.__annotator      = '/binary/snpEff/snpEff.jar' 
+        self.__parser         = '/binary/parse_annotation.py'
+        self.__lineage_parser = '/binary/lineage_parser.py'
+        self.__lineages       = '/binary/lineage_markers.txt'
+        self.__exclusion      = '/binary/loci_filtered.txt'
+        self.__excluded       = '/binary/excluded_loci.txt'
+        self.__coverage_estimator = '/binary/coverage_estimator.py'
+        self.resloci          = '/binary/included_loci.txt'
+        self.__bedlist        = '/binary/bed_list.txt'     
+        self.__resis_parser   = '/binary/resis_parser.py'
 
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
