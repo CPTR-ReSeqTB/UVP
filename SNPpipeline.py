@@ -44,6 +44,7 @@ class snp():
         self.__CallCommand('mkdir', ['mkdir', '-p', self.kraken])
         #self.__CallCommand('mkdir', ['mkdir', '-p', self.kvarq])
         self.__log = self.fOut + "/" + self.name + ".log"
+        self.__lineage = self.fOut + "/" + self.name + ".lineage_report.txt"
         self.__logFH = open(self.__log, 'w')
         self.__logFH.write(argString + "\n\n")
         #self.__logged = True
@@ -212,7 +213,7 @@ class snp():
         if self.paired:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
                                self.__krakendb, '--gzip-compressed', self.input, self.input2,
-                               '--paired', '--fastq-input', '--threads', '4', '--classified-out',
+                               '--paired', '--fastq-input', '--threads', '12', '--classified-out',
                                 self.name + "_classified_Reads.fastq"])
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
                                self.__krakendb, self.kraken + "/kraken.txt"])
@@ -227,22 +228,18 @@ class snp():
         fh1 = open(krakenOut,'r')
         for lines in fh1:
             fields = lines.rstrip("\r\n").split("\t") 
-            if fields[5].find("Mycobacterium tuberculosis") != -1:
+            if fields[5].find("Mycobacterium tuberculosis") != -1 or fields[5].find("Mycobacterium canettii") != -1:
                cov += float(fields[0])
         if cov < 90:
            self.__CallCommand('mv', ['mv', self.input, self.flog])
+           self.__CallCommand('rm', ['rm', self.kraken + "/kraken.txt"])
            self.__logFH.write("not species specific\n")
            i = datetime.now()
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "not species specific\n")
            if self.paired:
               self.__CallCommand('mv', ['mv', self.input2, self.flog])
               self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input2 + "\t" + "not species specific\n")
-           sys.exit(2)
-
-    """ Lineage specificity check """
-    def runKvarq(self):
-        self.__ifVerbose("Running Kvarq.")
-        self.__CallCommand('kvarq',['kvarq', 'scan', '-l', 'MTBC', '-p', self.input, self.kvarq + "/" + self.name + ".json"]) 
+           sys.exit(2) 
     
     """ Aligners """ 
     def runBWA(self, bwa):
@@ -324,9 +321,9 @@ class snp():
 
         """ Re-alignment around InDels using GATK """
         self.__ifVerbose("   Running RealignerTargetCreator.")
-        self.__CallCommand('RealignerTargetCreator', ['java', '-Xmx16g', '-jar', self.__gatk, '-T', 
+        self.__CallCommand('RealignerTargetCreator', ['java', '-Xmx32g', '-jar', self.__gatk, '-T', 
                            'RealignerTargetCreator', '-I', GATKdir +'/GATK_sdr.bam', '-R', self.reference, 
-                           '-o', GATKdir +'/GATK.intervals', '-nt', '4'])
+                           '-o', GATKdir +'/GATK.intervals', '-nt', '8'])
         self.__ifVerbose("   Running IndelRealigner.")
         self.__CallCommand('IndelRealigner', ['java', '-Xmx4g', '-jar', self.__gatk, '-T', 'IndelRealigner', '-l', 
                            'INFO', '-I', GATKdir +'/GATK_sdr.bam', '-R', self.reference, '-targetIntervals', 
@@ -351,34 +348,6 @@ class snp():
         self.__CallCommand('rm', ['rm', '-r', self.tmp])
     
     """ Callers """
-    def runGATK(self):
-        if os.path.isfile(self.__finalBam):
-            self.__ifVerbose("Calling SNPs/InDels with GATK.")
-            self.__logFH.write("########## Calling SNPs/InDels with GATK. ##########\n")
-            GATKdir = self.outdir + "/GATK"
-            
-            """ Call SNPs/InDels with GATK """
-            self.__ifVerbose("   Running UnifiedGenotyper.")
-            self.__CallCommand('UnifiedGenotyper', ['java', '-Xmx4g', '-jar', self.__gatk, '-T', 'UnifiedGenotyper', 
-                               '-glm', 'BOTH', '-R', self.reference, '-I', self.__finalBam, '-o',  GATKdir +'/GATK.vcf', 
-                               '-stand_call_conf', '30.0', '-stand_emit_conf', '30.0']) 
-            self.__ifVerbose("   Running VariantFiltration.")
-            self.__CallCommand('VariantFiltration', ['java', '-Xmx4g', '-jar', self.__gatk, '-T', 'VariantFiltration', 
-                               '-R', self.reference, '-cluster', '3', '-window', '10', '-V',
-                               GATKdir +'/GATK.vcf', '-o', self.fOut + "/" + self.name +'_GATK.vcf',
-                               '-filter', 'QUAL < 30.0 || DP < 5 || QD < 1.5 || MQ < 25.0','-filterName', 'StdFilter',
-                               '-filter', 'MQ0 >= 4 && ((MQ0 / (1.0 * DP)) > 0.1)', '-filterName', 'HARD_TO_VALIDATE',
-                               '-filter', 'DP < 10|| QD < 2.5', '-filterName', 'LowConf',
-                               '-filter', 'MQ < 40.0||FS > 60.0', '-filterName', 'gatkFilter'])
-
-            """ Set final VCF file. """
-            
-            if not self.__finalVCF: 
-                self.__finalVCF = self.fOut + "/" + self.name +'_GATK.vcf'
-        else:
-            # print error
-            pass
-    
     def runSamTools(self):
         """ Call SNPs and InDels using SamTools """
         if os.path.isfile(self.__finalBam):
@@ -432,13 +401,13 @@ class snp():
            self.__annotation = self.fOut + "/" + self.name +'_annotation.txt'
            self.__ifVerbose("parsing final Annotation.")
            self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Final_annotation.txt'],
-                              ['python', self.__parser, self.__annotation])
+                              ['python', self.__parser, self.__annotation, self.name])
 
            self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_Resistance_annotation.txt'],
                                 ['java', '-Xmx4g', '-jar', self.__annotator, 'NC_000962', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'])
            self.__ifVerbose("parsing final Annotation.")
            self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'],
-                              ['python', self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
+                              ['python', self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt', self.name])
             
         else:
             self.__ifVerbose("Use SamTools, GATK, or Freebayes to annotate the final VCF.")
@@ -448,7 +417,19 @@ class snp():
         self.__ifVerbose("Running Lineage Analysis")
         self.__final_annotation = self.fOut + "/" + self.name +'_Final_annotation.txt'
         self.__CallCommand(['lineage parsing', self.fOut + "/" + self.name +'_Lineage.txt'],
-                              ['python', self.__lineage_parser, self.__lineages, self.__final_annotation])
+                              ['python', self.__lineage_parser, self.__lineages, self.__final_annotation, self.__lineage, self.name])
+        fh1 = open(self.__lineage,'r')
+        for line in fh1:
+            lined = line.rstrip("\r\n")
+            i = datetime.now()
+            if "No Informative SNPs" in lined:
+                self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+            elif "no precise lineage" in lined:
+                self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+            elif "no concordance" in lined:
+                self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+        fh1.close()
+                     
     def runCoverage(self):
         """ Run Genome Coverage Statistics """
         self.__ifVerbose("Running Genome Coverage Statistics")

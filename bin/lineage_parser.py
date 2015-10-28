@@ -1,17 +1,24 @@
 #! /usr/bin/python
 
+""" This script accepts the final annotation file and the lineage marker SNPs file  """
+""" and infers the lineage and pssible sublineage classification of the isolate  """
+""" it requires a sample ID name (string) and an output file name(string) """
+
 import sys
 from string import join
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]
+input3 = sys.argv[3]
+input4 = sys.argv[4]
+
 
 fh1 = open(input1, 'r')
 sublinn = ""
 (lineage,position,ref,alt) = ([],[],[],[])
 prevlin = []
 prevsub = []
-tribes = ["lineages","Indo Oceanic","East Asian","East African Indian","Euro American","African I","African II","Ethiopian"]
+tribes = ["lineages","Indo-Oceanic","East-Asian","East-African-Indian","Euro-American","West-Africa 1","West-Africa 2","Ethiopian"]
 (concord,discord,concord1,discord1,count) = (0,0,0,0,0)
 discordance = False
 sublinneage = False
@@ -39,7 +46,6 @@ for lines in fh2:
        BOV = fields[2]
     if fields[2] == '1882180':
        BOV_AFRI = '1882180'
-       
     if fields[2] in position:
        ind = position.index(fields[2])
        if alt[ind] == fields[4]:
@@ -54,8 +60,7 @@ for lines in fh2:
                 concord +=1
              for i in range(0,len(prevsub)):
                  if len(sublinn) < len(prevsub[i]) : 
-                    sublinn = prevsub[i]
-                    
+                    sublinn = prevsub[i]     
           else:
                 lin = lineage[ind]
                 prevlin.append(lin)
@@ -64,6 +69,11 @@ for lines in fh2:
                    discord1 += 1
                 else:
                   concord1 += 1
+
+fh2.close()
+
+fh3 = open(input3,'w')
+print >> fh3, "Sample ID" + "\t" + "Lineage" + "\t" + "Lineage Name" + "\t" + "Sublineage"
 
 split_first = ['NA']
 if len(prevsub) > 0:
@@ -79,36 +89,55 @@ if len(prevlin) == 0:
              discordance = True
       if discordance:
          print "no precise lineage inferred"
+         print >> fh3, "no precise lineage inferred"
+         sys.exit(1)
       else:
          if len(split_first) > 1:
             print "Lineage: " + split_first[0] + " :  " + tribes[int(split_first[0])]
             print "Sub-lineage: " + sublinn
+            print >> fh3, input4 + "\t" + split_first[0] + "\t" + tribes[int(split_first[0])] + "\t" + sublinn
+         elif len(linfour) > 2 :
+            print "SNP" + " " + linfour + "  suggests sublineage 4.9"
+            print "Lineage: " + "4" + " :  " + "Euro American"
+            print >> fh3, input4 + "\t" + "4" + "\t" + "Euro American" + "\t" + "4.9"
          else:
             print "No Informative SNPs detected"
+            print >> fh3, "No Informative SNPs detected"
    elif len(prevsub) == 0:
      if len(linfour) > 2:
          print "SNP" + " " + linfour + "  suggests sublineage 4.9"
          print "Lineage: " + "4" + " :  " + "Euro American"
+         print >> fh3, input4 + "\t" + "4" + "\t" +  "Euro American" + "\t" + "4.9"
      else:
          print "No Informative SNPs detected"
+         print >> fh3, "No Informative SNPs detected"
 else:
      for i in range(0,len(prevlin) - 1):
          if prevlin[i - 1] != prevlin[i]:
             discordance = True
      if discordance == True:
-        print "no concordance between predicted lineage and sublineage(s)" 
+        print "no concordance between predicted lineage and sublineage(s)"
+        print >> fh3, "no concordance between predicted lineage and sublineage(s)"
+        sys.exit(1) 
      if len(prevsub) > 0 and prevlin[0] != split_first[0]:
         if len(BOV_AFRI) > 0:
-           print "Lineage: "  + prevlin[0] 
+           print "Lineage: "  + prevlin[0] + " " + tribes[int(prevlin[0])]
            print "Sub-lineage: " + "BOV_AFRI"
+           print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "BOV_AFRI"
         elif len(BOV) > 0:
            print "Lineage: " + "BOV"
+           print >> fh3, input4 + "\t" + "BOV" + "\t" + "Bovine" + "\t" + "NA"
         else:
            print "no concordance between predicted lineage and sublineage"
-     else:  
-        print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
-        if len(sublinn) > 1:
+           sys.exit(1)
+     else:
+        if len(sublinn) < 1: 
+           print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
+           print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "NA" 
+        elif len(sublinn) > 1:
+           print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
            print "Sub-lineage: " + sublinn
+           print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + sublinn
 
 
               

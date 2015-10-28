@@ -1,5 +1,8 @@
 #! /usr/bin/python
 
+""" Script accepts BEDTools coverage output file and samtools depth command output file   """
+""" and estimates the coverage across genomic regions that are in the input file """
+
 import sys
 
 input1 = sys.argv[1]
@@ -18,6 +21,8 @@ for lines in fh1:
     perc_cov.append(fields[7])
 
 fh1.close()
+
+print "Chrom" + "\t" + "Start" + "\t" + "End" + "\t" + "Feature" + "\t" + "Average Depth" + "\t" + "Percent Region Coverage"
 
 fh2 = open(input2,'r')
 for lines in fh2:

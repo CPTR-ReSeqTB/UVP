@@ -1,5 +1,8 @@
 #! /usr/bin/python
 
+""" The script accepts a SnpEff annotated VCF file and the sample ID name (string) as input options """
+""" it parses files and creates a final annotation file that is in a ReseqTB mappable format """
+
 import sys
 import re
 from string import join
@@ -71,18 +74,35 @@ for lines in fh1:
     subannot   = annot.split(",")
     smallannot = subannot[0].split("|")
     if smallannot[2] == "MODIFIER":
-       annotation         = 'Upstream variant'
-       variant            = 'NA'
-       nucleotide_change  = smallannot[9]
-       amino_acid_change  = 'NA'
-       gene_name          = 'NA'
-       gene_id            = 'NA'
-       transcript         = 'NA'
-       transcript_pos     = 'NA'
-       orig_aacid         = 'NA'
-       new_aacid	  = 'NA'
-       codon_pos	  = 'NA'
-       annotation_details = ','.join(subannot[1:])
+       if "rrs" in annot and 1471845 < int(position) < 1473382 :
+           annotation         = 'Intragenic_variant'
+           if len(fields[4]) > 1: 
+              variant = "INDEL"
+           else:
+              variant = "SNP"
+           nucleotide_change  = smallannot[9]
+           amino_acid_change  = 'NA'
+           gene_name          = 'rrs'
+           gene_id            = 'Rvnr01'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[0:])
+       else:
+           annotation         = 'Non-Coding'
+           variant            = 'NA'
+           nucleotide_change  = smallannot[9]
+           amino_acid_change  = 'NA'
+           gene_name          = 'NA'
+           gene_id            = 'NA'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[1:])
        if len(position1) != 0:
           if Block == True:
               print  input2 + "\t"  + fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + 'MNV' + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + 'Block_Substitution' + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" + annotation_details1
@@ -129,12 +149,15 @@ for lines in fh1:
               codon_pos = pos11 + "-" + pos12
            
            else:
-              codon_pos = re.findall(r'\d+', smallannot[10])[0]
-              orig_aacid = smallannot[10][2:5]
-              
+              if len(smallannot[10]) > 0:
+                 codon_pos = re.findall(r'\d+', smallannot[10])[0]
+                 orig_aacid = smallannot[10][2:5]
+              else:
+                  codon_pos =  "NA"
+                  orig_aacid = "NA"     
         else :
             orig_aacid = smallannot[10][2:5]
-            if '*' in smallannot[10]:
+            if '*' in smallannot[10] or '?' in smallannot[10] :
                new_aacid  = 'NA'
             else:
                new_aacid  = smallannot[10][-3:]
