@@ -83,7 +83,23 @@ for lines in fh1:
            nucleotide_change  = smallannot[9]
            amino_acid_change  = 'NA'
            gene_name          = 'rrs'
-           gene_id            = 'Rvnr01'
+           gene_id            = 'MTB000019'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[0:])
+       elif "rrl" in annot and 1473658 < int(position) < 1476495 :
+           annotation         = 'Intragenic_variant'
+           if len(fields[4]) > 1: 
+              variant = "INDEL"
+           else:
+              variant = "SNP"
+           nucleotide_change  = smallannot[9]
+           amino_acid_change  = 'NA'
+           gene_name          = 'rrl'
+           gene_id            = 'MTB000020'
            transcript         = 'NA'
            transcript_pos     = 'NA'
            orig_aacid         = 'NA'
