@@ -54,43 +54,49 @@ class snp():
         self.__logged = True
 				
 	# Format Validation
-	self.__fastqval          = '/binary/fastQValidator'
+	self.__fastqval        = '/scicomp/home/krt7/binary/fastQValidator'
 
         #fastq QC
-        self.__prinseq           = '/binary/prinseq-lite.pl'
-        self.__kraken            = '/KRAKEN/kraken'
-        self.__krakendb          = '/KRAKEN/minikraken'
-        self.__krakenreport      = '/KRAKEN/kraken-report'
-        self.__pigz              = '/binary/pigz'
-        self.__unpigz            = '/binary/unpigz'
+        self.__prinseq         = '/scicomp/home/krt7/binary/prinseq-lite.pl'
+        self.__kraken          = '/scicomp/home/krt7/KRAKEN/kraken'
+        self.__krakendb        = '/scicomp/home/krt7/KRAKEN/minikraken'
+        self.__krakenreport    = '/scicomp/home/krt7/KRAKEN/kraken-report'
+        self.__pigz            = '/scicomp/home/krt7/binary/pigz'
+        self.__unpigz            = '/scicomp/home/krt7/binary/unpigz'
         
         # Mapping
-        self.__bwa      = '/binary/bwa'
-        self.__samtools = '/binary/samtools/samtools'
-        self.__qualimap = '/binary/qualimap_v2.1.1/qualimap'
+        self.__bwa      = '/scicomp/home/krt7/binary/bwa'
+        self.__samtools = '/scicomp/home/krt7/binary/samtools/samtools'
+        self.__qualimap = '/scicomp/home/krt7/binary/qualimap_v2.1.1/qualimap'
 
 
         # Picard-Tools
-        self.__picard     = '/binary/picard/picard.jar'
+        self.__picard     = '/scicomp/home/krt7/binary/picard/picard.jar'
+        self.__sortsam    = '/usr/local/bin/SortSam.jar'
+        self.__samformat  = '/usr/local/bin/SamFormatConverter.jar'
+        self.__readgroups = '/usr/local/bin/AddOrReplaceReadGroups.jar'
+        self.__bamindex   = '/usr/local/bin/BuildBamIndex.jar'
+        self.__seqdiction = '/usr/local/bin/CreateSequenceDictionary.jar'
+        self.__markdupes  = '/usr/local/bin/MarkDuplicates.jar'
 
         # SNP / InDel Calling
-        self.__gatk = '/binary/GenomeAnalysisTK.jar'
+        self.__gatk = '/scicomp/home/krt7/binary/GenomeAnalysisTK.jar'
         
         # Other
-        self.__bcftools       = '/binary/bcftools/bcftools'
-        self.__vcfannotate    = '/binary/vcftools/bin/vcf-annotate'
-        self.__vcftools       = '/binary/vcftools/bin/vcftools'
-        self.__vcfutils       = '/binary/bcftools/vcfutils.pl' 
-        self.__annotator      = '/binary/snpEff/snpEff.jar' 
-        self.__parser         = '/binary/parse_annotation.py'
-        self.__lineage_parser = '/binary/lineage_parser.py'
-        self.__lineages       = '/binary/lineage_markers.txt'
-        self.__exclusion      = '/binary/loci_filtered.txt'
-        self.__excluded       = '/binary/excluded_loci.txt'
-        self.__coverage_estimator = '/binary/coverage_estimator.py'
-        self.resloci          = '/binary/included_loci.txt'
-        self.__bedlist        = '/binary/bed_list.txt'     
-        self.__resis_parser   = '/binary/resis_parser.py'
+        self.__bcftools       = '/scicomp/home/krt7/binary/bcftools/bcftools'
+        self.__vcfannotate    = '/scicomp/home/krt7/binary/vcftools/bin/vcf-annotate'
+        self.__vcftools       = '/scicomp/home/krt7/binary/vcftools/bin/vcftools'
+        self.__vcfutils       = '/scicomp/home/krt7/binary/bcftools/vcfutils.pl' 
+        self.__annotator      = '/scicomp/home/krt7/binary/snpEff/snpEff.jar' 
+        self.__parser         = '/scicomp/home/krt7/binary/parse_annotation.py'
+        self.__lineage_parser = '/scicomp/home/krt7/binary/lineage_parser.py'
+        self.__lineages       = '/scicomp/home/krt7/binary/lineage_markers.txt'
+        self.__exclusion      = '/scicomp/home/krt7/binary/loci_filtered.txt'
+        self.__excluded       = '/scicomp/home/krt7/binary/excluded_loci.txt'
+        self.__coverage_estimator = '/scicomp/home/krt7/binary/coverage_estimator.py'
+        self.resloci          = '/scicomp/home/krt7/binary/included_loci.txt'
+        self.__bedlist        = '/scicomp/home/krt7/binary/bed_list.txt'     
+        self.__resis_parser   = '/scicomp/home/krt7/binary/resis_parser.py'
 
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
@@ -153,13 +159,13 @@ class snp():
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:  " + self.input + "\t" + "not in fastq format\n")
                   sys.exit(1)
-               if lines < 200000:
+               if lines < 100000:
                   self.__CallCommand('mv', ['mv', self.input, self.flog])
                   self.__logFH.write("not enough read coverage\n")
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "not enough read coverage\n")
                   if self.paired:
-                     if lines < 200000 or lines2 < 200000:
+                     if lines < 100000 or lines2 < 100000:
                         self.__CallCommand('mv', ['mv', self.input2, self.flog])
                         i = datetime.now()
                         self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input2 + "\t" + "not enough read coverage\n")
@@ -412,6 +418,8 @@ class snp():
         self.__final_annotation = self.fOut + "/" + self.name +'_Final_annotation.txt'
         self.__CallCommand(['lineage parsing', self.fOut + "/" + self.name +'_Lineage.txt'],
                               ['python', self.__lineage_parser, self.__lineages, self.__final_annotation, self.__lineage, self.name])
+        count1 = 0
+        count2 = 0
         fh1 = open(self.__lineage,'r')
         for line in fh1:
             lined = line.rstrip("\r\n")
@@ -423,16 +431,35 @@ class snp():
             elif "no concordance" in lined:
                 self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
         fh1.close()
-                     
+        fh2 = open(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt','r')
+        for lines in fh2:
+            lined = lines.rstrip("\r\n").split("\t")
+            if lined[16] == "rrs":
+               count1 += 1
+            elif lined[16] == "rrl":
+               count2 += 1
+        if count1 > 2 or count2 > 2 :
+           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "mixed species suspected\n")
+        fh2.close()
+      
     def runCoverage(self):
         """ Run Genome Coverage Statistics """
+        cov = ""
         self.__ifVerbose("Running Genome Coverage Statistics")
         samDir = self.outdir + "/SamTools"
+        i = datetime.now()
         self.__CallCommand(['coverage estimator', self.fOut + "/" + self.name + '_Coverage.txt'],
                             ['python', self.__coverage_estimator, samDir + '/coverage.txt'])
         self.__CallCommand(['resistance region coverage estimator', self.fOut + "/" + self.name + '_Resistance_Region_Coverage.txt'],
                             ['python', self.__resis_parser, samDir + '/bed_sorted_coverage.txt', samDir + '/coverage.txt'])
-                            
+        fh2 = open(self.fOut + "/" + self.name + '_Coverage.txt','r')
+        for line in fh2:
+            if line.startswith("Average"):
+               cov_str = line.split(":")
+               cov = cov_str[1].strip(" ")
+        if int(cov) < 10:
+           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth")
+        fh2.close()                  
         
     def cleanUp(self):
         """ Clean up the temporary files, and move them to a proper folder. """

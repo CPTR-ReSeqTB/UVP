@@ -19,6 +19,7 @@ read_depth          = ""
 quality             = ""
 perc_alt            = ""
 nucleotide_change   = ""
+nuc_change          = ""
 transcript_pos      = ""
 amino_acid_change   = ""
 orig_aacid          = ""
@@ -76,11 +77,12 @@ for lines in fh1:
     if smallannot[2] == "MODIFIER":
        if "rrs" in annot and 1471845 < int(position) < 1473382 :
            annotation         = 'Intragenic_variant'
+           nuc_change         = str(int(position) - 1471845)
            if len(fields[4]) > 1: 
               variant = "INDEL"
            else:
               variant = "SNP"
-           nucleotide_change  = smallannot[9]
+           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
            amino_acid_change  = 'NA'
            gene_name          = 'rrs'
            gene_id            = 'MTB000019'
@@ -90,16 +92,102 @@ for lines in fh1:
            new_aacid	  = 'NA'
            codon_pos	  = 'NA'
            annotation_details = ','.join(subannot[0:])
-       elif "rrl" in annot and 1473658 < int(position) < 1476495 :
+       elif "rrl" in annot and 1473657 < int(position) < 1476495 :
            annotation         = 'Intragenic_variant'
+           nuc_change         = str(int(position) - 1473657)
            if len(fields[4]) > 1: 
               variant = "INDEL"
            else:
               variant = "SNP"
-           nucleotide_change  = smallannot[9]
+           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
            amino_acid_change  = 'NA'
            gene_name          = 'rrl'
            gene_id            = 'MTB000020'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[0:])
+       elif 1673338 < int(position) < 1673440 :
+           annotation         = 'Intragenic_variant'
+           nuc_change         = str(int(position) - 1673440)
+           if len(fields[4]) > 1: 
+              variant = "INDEL"
+           else:
+              variant = "SNP"
+           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
+           amino_acid_change  = 'NA'
+           gene_name          = 'inhA promoter'
+           gene_id            = 'inhA promoter'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[0:])
+       elif 2289241 < int(position) < 2289282 :
+           annotation         = 'Intragenic_variant'
+           nuc_change         = str(2289241 - int(position))
+           if len(fields[4]) > 1: 
+              variant = "INDEL"
+           else:
+              variant = "SNP"
+           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
+           amino_acid_change  = 'NA'
+           gene_name          = 'pncA promoter'
+           gene_id            = 'pncA promoter'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[0:])
+       elif 2715332 < int(position) < 2715384 :
+           annotation         = 'Intragenic_variant'
+           nuc_change         = str(2715332 - int(position))
+           if len(fields[4]) > 1: 
+              variant = "INDEL"
+           else:
+              variant = "SNP"
+           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
+           amino_acid_change  = 'NA'
+           gene_name          = 'eis promoter'
+           gene_id            = 'eis promoter'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[0:])
+       elif 2725991 < int(position) < 2726193 :
+           annotation         = 'Intragenic_variant'
+           nuc_change         = str(int(position) - 2726193)
+           if len(fields[4]) > 1: 
+              variant = "INDEL"
+           else:
+              variant = "SNP"
+           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
+           amino_acid_change  = 'NA'
+           gene_name          = 'aphC promoter'
+           gene_id            = 'aphC promoter'
+           transcript         = 'NA'
+           transcript_pos     = 'NA'
+           orig_aacid         = 'NA'
+           new_aacid	  = 'NA'
+           codon_pos	  = 'NA'
+           annotation_details = ','.join(subannot[0:])
+       elif 3568679 < int(position) < 3569109 :
+           annotation         = 'Intragenic_variant'
+           nuc_change         = str(3568679 - int(position))
+           if len(fields[4]) > 1: 
+              variant = "INDEL"
+           else:
+              variant = "SNP"
+           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
+           amino_acid_change  = 'NA'
+           gene_name          = 'whiB7 promoter'
+           gene_id            = 'whiB7 promoter'
            transcript         = 'NA'
            transcript_pos     = 'NA'
            orig_aacid         = 'NA'

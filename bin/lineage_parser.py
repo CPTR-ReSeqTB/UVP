@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 """ This script accepts the final annotation file and the lineage marker SNPs file  """
-""" and infers the lineage and pssible sublineage classification of the isolate  """
+""" and infers the lineage and possible sublineage classification of the isolate  """
 """ it requires a sample ID name (string) and an output file name(string) """
 
 import sys
@@ -80,6 +80,9 @@ if len(prevsub) > 0:
    split_first = sublinn.split(".")
    sublinneage = True
 if len(prevlin) == 0:
+   if len(BOV) > 0:
+            print "Lineage: " + "BOV"
+            print >> fh3, input4 + "\t" + "BOV" + "\t" + "Bovis" + "\t" + "NA"
    if len(BOV) == 0 or len(BOV_AFRI) == 0:
       for i in range(0,len(prevsub)): 
           split_lin = prevsub[i].split(".")
@@ -119,26 +122,17 @@ else:
         print "no concordance between predicted lineage and sublineage(s)"
         print >> fh3, "no concordance between predicted lineage and sublineage(s)"
         sys.exit(1) 
-     if len(prevsub) > 0 and prevlin[0] != split_first[0]:
-        if len(BOV_AFRI) > 0:
-           print "Lineage: "  + prevlin[0] + " " + tribes[int(prevlin[0])]
-           print "Sub-lineage: " + "BOV_AFRI"
-           print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "BOV_AFRI"
-        elif len(BOV) > 0:
-           print "Lineage: " + "BOV"
-           print >> fh3, input4 + "\t" + "BOV" + "\t" + "Bovine" + "\t" + "NA"
-        else:
-           print "no concordance between predicted lineage and sublineage"
-           sys.exit(1)
      else:
         if len(sublinn) < 1: 
            print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
            print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "NA" 
         elif len(sublinn) > 1:
            print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
-           print "Sub-lineage: " + sublinn
-           print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + sublinn
-
+           if sublinn.startswith('BOV_A'):
+              print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "NA"
+           else: 
+              print "Sub-lineage: " + sublinn
+              print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + sublinn
 
               
      
