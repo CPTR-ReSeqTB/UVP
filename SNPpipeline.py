@@ -438,7 +438,7 @@ class snp():
                count1 += 1
             elif lined[16] == "rrl":
                count2 += 1
-        if count1 > 2 or count2 > 2 :
+        if count1 > 5 or count2 > 5 :
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "mixed species suspected\n")
         fh2.close()
       
@@ -458,7 +458,7 @@ class snp():
                cov_str = line.split(":")
                cov = cov_str[1].strip(" ")
         if int(cov) < 10:
-           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth")
+           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
         fh2.close()                  
         
     def cleanUp(self):
