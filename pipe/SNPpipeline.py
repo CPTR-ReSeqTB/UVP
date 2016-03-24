@@ -22,7 +22,6 @@ class snp():
         self.prinseq = self.fOut + "/prinseq"
         self.qualimap = self.fOut + "/qualimap"
         self.kraken = self.fOut + "/kraken"
-        #self.kvarq = self.fOut + "/kvarq"
         self.paired = paired
         self.input2 = input2
         self.verbose = verbose
@@ -54,49 +53,43 @@ class snp():
         self.__logged = True
 				
 	# Format Validation
-	self.__fastqval        = '/scicomp/home/krt7/binary/fastQValidator'
-
+	self.__fastqval        = '/bin/fastQValidator'
+       
         #fastq QC
-        self.__prinseq         = '/scicomp/home/krt7/binary/prinseq-lite.pl'
-        self.__kraken          = '/scicomp/home/krt7/KRAKEN/kraken'
-        self.__krakendb        = '/scicomp/home/krt7/KRAKEN/minikraken'
-        self.__krakenreport    = '/scicomp/home/krt7/KRAKEN/kraken-report'
-        self.__pigz            = '/scicomp/home/krt7/binary/pigz'
-        self.__unpigz            = '/scicomp/home/krt7/binary/unpigz'
+        self.__prinseq         = '/bin/prinseq-lite.pl'
+        self.__kraken          = '/KRAKEN/kraken'
+        self.__krakendb        = 'KRAKEN/krakendb'
+        self.__krakenreport    = '/KRAKEN/kraken-report'
+        self.__pigz            = '/bin/pigz'
+        self.__unpigz          = '/bin/unpigz'
         
         # Mapping
-        self.__bwa      = '/scicomp/home/krt7/binary/bwa'
-        self.__samtools = '/scicomp/home/krt7/binary/samtools/samtools'
-        self.__qualimap = '/scicomp/home/krt7/binary/qualimap_v2.1.1/qualimap'
+        self.__bwa      = '/bin/bwa'
+        self.__samtools = '/bin/samtools'
+        self.__qualimap = '/bin/qualimap_v2.1.1/qualimap'
 
 
         # Picard-Tools
-        self.__picard     = '/scicomp/home/krt7/binary/picard/picard.jar'
-        self.__sortsam    = '/usr/local/bin/SortSam.jar'
-        self.__samformat  = '/usr/local/bin/SamFormatConverter.jar'
-        self.__readgroups = '/usr/local/bin/AddOrReplaceReadGroups.jar'
-        self.__bamindex   = '/usr/local/bin/BuildBamIndex.jar'
-        self.__seqdiction = '/usr/local/bin/CreateSequenceDictionary.jar'
-        self.__markdupes  = '/usr/local/bin/MarkDuplicates.jar'
+        self.__picard     = '/bin/picard/picard.jar'
 
         # SNP / InDel Calling
-        self.__gatk = '/scicomp/home/krt7/binary/GenomeAnalysisTK.jar'
+        self.__gatk       = '/bin/GenomeAnalysisTK.jar'
         
         # Other
-        self.__bcftools       = '/scicomp/home/krt7/binary/bcftools/bcftools'
-        self.__vcfannotate    = '/scicomp/home/krt7/binary/vcftools/bin/vcf-annotate'
-        self.__vcftools       = '/scicomp/home/krt7/binary/vcftools/bin/vcftools'
-        self.__vcfutils       = '/scicomp/home/krt7/binary/bcftools/vcfutils.pl' 
-        self.__annotator      = '/scicomp/home/krt7/binary/snpEff/snpEff.jar' 
-        self.__parser         = '/scicomp/home/krt7/binary/parse_annotation.py'
-        self.__lineage_parser = '/scicomp/home/krt7/binary/lineage_parser.py'
-        self.__lineages       = '/scicomp/home/krt7/binary/lineage_markers.txt'
-        self.__exclusion      = '/scicomp/home/krt7/binary/loci_filtered.txt'
-        self.__excluded       = '/scicomp/home/krt7/binary/excluded_loci.txt'
-        self.__coverage_estimator = '/scicomp/home/krt7/binary/coverage_estimator.py'
-        self.resloci          = '/scicomp/home/krt7/binary/included_loci.txt'
-        self.__bedlist        = '/scicomp/home/krt7/binary/bed_list.txt'     
-        self.__resis_parser   = '/scicomp/home/krt7/binary/resis_parser.py'
+        self.__bcftools       = '/bin/bcftools/bcftools'
+        self.__vcfannotate    = '/bin/vcftools/bin/vcf-annotate'
+        self.__vcftools       = '/bin/vcftools/bin/vcftools'
+        self.__vcfutils       = '/bin/bcftools/vcfutils.pl' 
+        self.__annotator      = '/bin/snpEff/snpEff.jar' 
+        self.__parser         = '/bin/parse_annotation.py'
+        self.__lineage_parser = '/bin/lineage_parser.py'
+        self.__lineages       = '/bin/lineage_markers.txt'
+        self.__exclusion      = '/bin/loci_filtered.txt'
+        self.__excluded       = '/bin/excluded_loci.txt'
+        self.__coverage_estimator = '/bin/coverage_estimator.py'
+        self.resloci          = '/bin/included_loci.txt'
+        self.__bedlist        = '/bin/bed_list.txt'     
+        self.__resis_parser   = '/bin/resis_parser.py'
 
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
@@ -362,13 +355,13 @@ class snp():
                                '-ugf', self.reference, self.__finalBam])
             self.__ifVerbose("   Running bcftools view.")
             self.__CallCommand(['bcftools view', samDir + '/samtools.vcf'], 
-                               ['bcftools', 'call', '-vcf', 'GQ', samDir + '/samtools.mpileup'])
+                               [self.__bcftools, 'call', '-vcf', 'GQ', samDir + '/samtools.mpileup'])
             self.__ifVerbose("   Running vcfutils.pl varFilter.")
             self.__CallCommand(['vcfutils.pl varFilter', samDir +'/SamTools.vcf'], 
                                [self.__vcfutils, 'varFilter', '-D1500', samDir + '/samtools.vcf'])
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
-                               ['vcf-annotate', '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
+                               [self.__vcfannotate, '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
             self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'], 
                                   [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                   '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
