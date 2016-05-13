@@ -78,8 +78,10 @@ for lines in fh1:
        if "rrs" in annot and 1471845 < int(position) < 1473382 :
            annotation         = 'Intragenic_variant'
            nuc_change         = str(int(position) - 1471845)
-           if len(fields[4]) > 1: 
-              variant = "INDEL"
+           if len(fields[4]) > len(fields[3]): 
+              variant = "Insertion"
+           elif len(fields[3]) > len(fields[4]):
+              variant = "Deletion"
            else:
               variant = "SNP"
            nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
@@ -95,8 +97,10 @@ for lines in fh1:
        elif "rrl" in annot and 1473657 < int(position) < 1476495 :
            annotation         = 'Intragenic_variant'
            nuc_change         = str(int(position) - 1473657)
-           if len(fields[4]) > 1: 
-              variant = "INDEL"
+           if len(fields[4]) > len(fields[3]): 
+              variant = "Insertion"
+           elif len(fields[3]) > len(fields[4]):
+              variant = "Deletion"
            else:
               variant = "SNP"
            nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
@@ -112,8 +116,10 @@ for lines in fh1:
        elif 1673338 < int(position) < 1673440 :
            annotation         = 'Intragenic_variant'
            nuc_change         = str(int(position) - 1673440)
-           if len(fields[4]) > 1: 
-              variant = "INDEL"
+           if len(fields[4]) > len(fields[3]): 
+              variant = "Insertion"
+           elif len(fields[3]) > len(fields[4]):
+              variant = "Deletion"
            else:
               variant = "SNP"
            nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
@@ -129,8 +135,10 @@ for lines in fh1:
        elif 2289241 < int(position) < 2289282 :
            annotation         = 'Intragenic_variant'
            nuc_change         = str(2289241 - int(position))
-           if len(fields[4]) > 1: 
-              variant = "INDEL"
+           if len(fields[4]) > len(fields[3]): 
+              variant = "Insertion"
+           elif len(fields[3]) > len(fields[4]):
+              variant = "Deletion"
            else:
               variant = "SNP"
            nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
@@ -146,8 +154,10 @@ for lines in fh1:
        elif 2715332 < int(position) < 2715384 :
            annotation         = 'Intragenic_variant'
            nuc_change         = str(2715332 - int(position))
-           if len(fields[4]) > 1: 
-              variant = "INDEL"
+           if len(fields[4]) > len(fields[3]): 
+              variant = "Insertion"
+           elif len(fields[3]) > len(fields[4]):
+              variant = "Deletion"
            else:
               variant = "SNP"
            nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
@@ -163,8 +173,10 @@ for lines in fh1:
        elif 2725991 < int(position) < 2726193 :
            annotation         = 'Intragenic_variant'
            nuc_change         = str(int(position) - 2726193)
-           if len(fields[4]) > 1: 
-              variant = "INDEL"
+           if len(fields[4]) > len(fields[3]): 
+              variant = "Insertion"
+           elif len(fields[3]) > len(fields[4]):
+              variant = "Deletion"
            else:
               variant = "SNP"
            nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
@@ -180,8 +192,10 @@ for lines in fh1:
        elif 3568679 < int(position) < 3569109 :
            annotation         = 'Intragenic_variant'
            nuc_change         = str(3568679 - int(position))
-           if len(fields[4]) > 1: 
-              variant = "INDEL"
+           if len(fields[4]) > len(fields[3]): 
+              variant = "Insertion"
+           elif len(fields[3]) > len(fields[4]):
+              variant = "Deletion"
            else:
               variant = "SNP"
            nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
@@ -269,7 +283,7 @@ for lines in fh1:
             codon_pos = re.findall(r'\d+', smallannot[10])[0]
         
         if len(position1) != 0:
-           if codon_pos == codon_pos1 and (int(position) - int(position1)) < 4 :
+           if codon_pos == codon_pos1 and (int(position) - int(position1)) < 4 and float(perc_alt11) > 98.0 :
               Block = True   
               print  input2 + "\t"  + fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + 'MNV' + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + 'Block_Substitution' + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" +  annotation_details1
            elif Block == True:

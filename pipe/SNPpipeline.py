@@ -22,6 +22,7 @@ class snp():
         self.prinseq = self.fOut + "/prinseq"
         self.qualimap = self.fOut + "/qualimap"
         self.kraken = self.fOut + "/kraken"
+        #self.kvarq = self.fOut + "/kvarq"
         self.paired = paired
         self.input2 = input2
         self.verbose = verbose
@@ -54,26 +55,25 @@ class snp():
 				
 	# Format Validation
 	self.__fastqval        = '/bin/fastQValidator'
-       
+
         #fastq QC
         self.__prinseq         = '/bin/prinseq-lite.pl'
         self.__kraken          = '/KRAKEN/kraken'
-        self.__krakendb        = 'KRAKEN/krakendb'
+        self.__krakendb        = '/KRAKEN/minikraken'
         self.__krakenreport    = '/KRAKEN/kraken-report'
         self.__pigz            = '/bin/pigz'
         self.__unpigz          = '/bin/unpigz'
         
         # Mapping
         self.__bwa      = '/bin/bwa'
-        self.__samtools = '/bin/samtools'
+        self.__samtools = '/bin/samtools/samtools'
         self.__qualimap = '/bin/qualimap_v2.1.1/qualimap'
-
 
         # Picard-Tools
         self.__picard     = '/bin/picard/picard.jar'
 
         # SNP / InDel Calling
-        self.__gatk       = '/bin/GenomeAnalysisTK.jar'
+        self.__gatk = '/bin/GenomeAnalysisTK.jar'
         
         # Other
         self.__bcftools       = '/bin/bcftools/bcftools'
@@ -90,6 +90,7 @@ class snp():
         self.resloci          = '/bin/included_loci.txt'
         self.__bedlist        = '/bin/bed_list.txt'     
         self.__resis_parser   = '/bin/resis_parser.py'
+        self.__del_parser     = '/bin/del_parse.py'
 
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
@@ -152,13 +153,13 @@ class snp():
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:  " + self.input + "\t" + "not in fastq format\n")
                   sys.exit(1)
-               if lines < 100000:
+               if lines < 1000:
                   self.__CallCommand('mv', ['mv', self.input, self.flog])
                   self.__logFH.write("not enough read coverage\n")
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "not enough read coverage\n")
                   if self.paired:
-                     if lines < 100000 or lines2 < 100000:
+                     if lines < 1000 or lines2 < 1000:
                         self.__CallCommand('mv', ['mv', self.input2, self.flog])
                         i = datetime.now()
                         self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input2 + "\t" + "not enough read coverage\n")
@@ -173,7 +174,7 @@ class snp():
            self.__CallCommand(['gunzip', self.prinseq + "/" + self.name + "2.fastq"],['gunzip', '-c', self.input2])
            self.__CallCommand('prinseq', [self.__prinseq, '-fastq', self.prinseq + "/" + self.name + '1.fastq', '-fastq2', 
                               self.prinseq + "/" + self.name + '2.fastq', '-min_qual_mean', '20', '-ns_max_n', '0', 
-                              '-out_format', '3', '-out_good', self.prinseq + "/" + self.name + "good", 
+                              '-out_format', '3','-out_good', self.prinseq + "/" + self.name + "good", 
                               '-out_bad', self.prinseq + "/" + self.name + "bad" ])
         else:
            self.__CallCommand(['gunzip', self.prinseq + "/" + self.name + ".fastq"],['gunzip','-c', self.input])
@@ -206,14 +207,14 @@ class snp():
         if self.paired:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
                                self.__krakendb, '--gzip-compressed', self.input, self.input2,
-                               '--paired', '--fastq-input', '--threads', '12', '--classified-out',
+                               '--paired', '--fastq-input', '--threads', '20', '--classified-out',
                                 self.name + "_classified_Reads.fastq"])
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
                                self.__krakendb, self.kraken + "/kraken.txt"])
         else:
-           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
+           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],['kraken', '--db', 
                                self.__krakendb, '--gzip-compressed', self.input, '--fastq-input', 
-                               '--threads', '4', '--classified-out', self.name + "_classified_Reads.fastq"])                     
+                               '--threads', '12', '--classified-out', self.name + "_classified_Reads.fastq"])                     
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
                                self.__krakendb, self.kraken + "/kraken.txt"])
         krakenOut = self.kraken + "/final_report.txt"
@@ -221,7 +222,7 @@ class snp():
         fh1 = open(krakenOut,'r')
         for lines in fh1:
             fields = lines.rstrip("\r\n").split("\t") 
-            if fields[5].find("Mycobacterium tuberculosis") != -1 or fields[5].find("Mycobacterium canettii") != -1:
+            if fields[5].find("Mycobacterium tuberculosis complex") != -1:
                cov += float(fields[0])
         if cov < 90:
            self.__CallCommand('mv', ['mv', self.input, self.flog])
@@ -265,12 +266,12 @@ class snp():
         """ Make use of bwa mem """
         if self.paired:
             self.__ifVerbose("   Running BWA mem on paired end reads.")
-            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem', '-t', '10', '-R', 
+            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem','-t','10','-R', 
                                "@RG\tID:" + self.name + "\tSM:" + self.name + "\tPL:ILLUMINA", 
                                 self.reference, self.input, self.input2])
         else:
             self.__ifVerbose("   Running BWA mem on single end reads.")
-            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem', '-t', '10', '-R', 
+            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem','-t', '10', '-R', 
                                "@RG\tID:" + self.name + "\tSM:" + self.name + "\tPL:ILLUMINA", 
                                 self.reference, self.input])       
     
@@ -304,10 +305,10 @@ class snp():
                            'METRICS_FILE='+ GATKdir +'/MarkDupes.metrics', 'ASSUME_SORTED=true', 
                            'REMOVE_DUPLICATES=false', 'VALIDATION_STRINGENCY=LENIENT'])         
         self.__ifVerbose("   Running AddOrReplaceReadGroups.")
-        self.__CallCommand('AddOrReplaceReadGroups', ['java', '-Xmx8g', '-jar', self.__picard, 'AddOrReplaceReadGroups', 
-                           'INPUT='+ GATKdir +'/GATK_sd.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
-                           'SORT_ORDER=coordinate', 'RGID=GATK', 'RGLB=GATK', 'RGPL=Illumina', 'RGSM=GATK', 
-                           'RGPU=GATK', 'VALIDATION_STRINGENCY=LENIENT'])
+        #self.__CallCommand('AddOrReplaceReadGroups', ['java', '-Xmx8g', '-jar', self.__picard, 'AddOrReplaceReadGroups', 
+                           #'INPUT='+ GATKdir +'/GATK_sd.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
+                           #'SORT_ORDER=coordinate', 'RGID=GATK', 'RGLB=GATK', 'RGPL=Illumina', 'RGSM=GATK', 
+                           #'RGPU=GATK', 'VALIDATION_STRINGENCY=LENIENT'])
         self.__ifVerbose("   Running BuildBamIndex.")
         self.__CallCommand('BuildBamIndex', ['java', '-Xmx8g', '-jar', self.__picard, 'BuildBamIndex',  
                            'INPUT='+ GATKdir +'/GATK_sdr.bam', 'VALIDATION_STRINGENCY=LENIENT'])
@@ -355,13 +356,13 @@ class snp():
                                '-ugf', self.reference, self.__finalBam])
             self.__ifVerbose("   Running bcftools view.")
             self.__CallCommand(['bcftools view', samDir + '/samtools.vcf'], 
-                               [self.__bcftools, 'call', '-vcf', 'GQ', samDir + '/samtools.mpileup'])
+                               ['bcftools', 'call', '-vcf', 'GQ', samDir + '/samtools.mpileup'])
             self.__ifVerbose("   Running vcfutils.pl varFilter.")
             self.__CallCommand(['vcfutils.pl varFilter', samDir +'/SamTools.vcf'], 
                                [self.__vcfutils, 'varFilter', '-D1500', samDir + '/samtools.vcf'])
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
-                               [self.__vcfannotate, '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
+                               ['vcf-annotate', '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
             self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'], 
                                   [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                   '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
@@ -413,6 +414,7 @@ class snp():
                               ['python', self.__lineage_parser, self.__lineages, self.__final_annotation, self.__lineage, self.name])
         count1 = 0
         count2 = 0
+        count3 = 0
         fh1 = open(self.__lineage,'r')
         for line in fh1:
             lined = line.rstrip("\r\n")
@@ -431,13 +433,21 @@ class snp():
                count1 += 1
             elif lined[16] == "rrl":
                count2 += 1
+            if lined[9] == "MNV":
+               count3 += 1
         if count1 > 5 or count2 > 5 :
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "mixed species suspected\n")
+        if count3 > 0:
+           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Block substitution inferred\n")
         fh2.close()
+        
       
     def runCoverage(self):
         """ Run Genome Coverage Statistics """
         cov = ""
+        notes = []
+        dele = True
+
         self.__ifVerbose("Running Genome Coverage Statistics")
         samDir = self.outdir + "/SamTools"
         i = datetime.now()
@@ -453,14 +463,26 @@ class snp():
         if int(cov) < 10:
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
         fh2.close()                  
-        
+        self.__CallCommand(['resistance loci deletion parser', self.fOut + "/" + self.name + '_Resistance_deletion.txt'],
+                            ['python', self.__del_parser, self.fOut + "/" + self.name, self.name])
+        fh3 = open(self.fOut + "/" + self.name + '_Resistance_deletion.txt','r')
+        for line in fh3:
+            fields = line.rstrip("\r\n").split("\t")
+            notes.append(fields[1])
+        for keys in notes:
+            if "deletion" in keys:
+               dele = False
+        if dele == True:
+           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "gene deletion inferred\n")
+        fh3.close() 
+
     def cleanUp(self):
         """ Clean up the temporary files, and move them to a proper folder. """
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
         self.__CallCommand('rm', ['rm',  self.input])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
-        self.__CallCommand('rm', ['rm',  self.__finalBam])
+        #self.__CallCommand('rm', ['rm',  self.__finalBam])
         self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
         self.__CallCommand('rm', ['rm',  self.kraken + "/kraken.txt"])
        
