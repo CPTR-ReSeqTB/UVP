@@ -69,6 +69,7 @@ class snp():
         self.__samtools = '/bin/samtools/samtools'
         self.__qualimap = '/bin/qualimap_v2.1.1/qualimap'
 
+
         # Picard-Tools
         self.__picard     = '/bin/picard/picard.jar'
 
@@ -88,6 +89,7 @@ class snp():
         self.__excluded       = '/bin/excluded_loci.txt'
         self.__coverage_estimator = '/bin/coverage_estimator.py'
         self.resloci          = '/bin/included_loci.txt'
+        self.mutationloci     = '/bin/mutation_loci.txt'
         self.__bedlist        = '/bin/bed_list.txt'     
         self.__resis_parser   = '/bin/resis_parser.py'
         self.__del_parser     = '/bin/del_parse.py'
@@ -205,18 +207,18 @@ class snp():
         valiOut = self.fOut + "/validation"
         self.__logFH.write("########## Running Kraken. ##########\n")
         if self.paired:
-           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
-                               self.__krakendb, '--gzip-compressed', self.input, self.input2,
+           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],['kraken', '--db', 
+                               'standard', '--gzip-compressed', self.input, self.input2,
                                '--paired', '--fastq-input', '--threads', '20', '--classified-out',
                                 self.name + "_classified_Reads.fastq"])
-           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
-                               self.__krakendb, self.kraken + "/kraken.txt"])
+           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],['kraken-report', '--db',
+                               'standard', self.kraken + "/kraken.txt"])
         else:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],['kraken', '--db', 
-                               self.__krakendb, '--gzip-compressed', self.input, '--fastq-input', 
+                               'standard', '--gzip-compressed', self.input, '--fastq-input', 
                                '--threads', '12', '--classified-out', self.name + "_classified_Reads.fastq"])                     
-           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
-                               self.__krakendb, self.kraken + "/kraken.txt"])
+           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],['kraken-report', '--db',
+                               'standard', self.kraken + "/kraken.txt"])
         krakenOut = self.kraken + "/final_report.txt"
         cov = 0
         fh1 = open(krakenOut,'r')
@@ -304,15 +306,9 @@ class snp():
                            'INPUT='+ GATKdir +'/GATK_s.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
                            'METRICS_FILE='+ GATKdir +'/MarkDupes.metrics', 'ASSUME_SORTED=true', 
                            'REMOVE_DUPLICATES=false', 'VALIDATION_STRINGENCY=LENIENT'])         
-        self.__ifVerbose("   Running AddOrReplaceReadGroups.")
-        #self.__CallCommand('AddOrReplaceReadGroups', ['java', '-Xmx8g', '-jar', self.__picard, 'AddOrReplaceReadGroups', 
-                           #'INPUT='+ GATKdir +'/GATK_sd.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
-                           #'SORT_ORDER=coordinate', 'RGID=GATK', 'RGLB=GATK', 'RGPL=Illumina', 'RGSM=GATK', 
-                           #'RGPU=GATK', 'VALIDATION_STRINGENCY=LENIENT'])
         self.__ifVerbose("   Running BuildBamIndex.")
         self.__CallCommand('BuildBamIndex', ['java', '-Xmx8g', '-jar', self.__picard, 'BuildBamIndex',  
                            'INPUT='+ GATKdir +'/GATK_sdr.bam', 'VALIDATION_STRINGENCY=LENIENT'])
-
         """ Re-alignment around InDels using GATK """
         self.__ifVerbose("   Running RealignerTargetCreator.")
         self.__CallCommand('RealignerTargetCreator', ['java', '-Xmx32g', '-jar', self.__gatk, '-T', 
@@ -363,9 +359,6 @@ class snp():
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
                                ['vcf-annotate', '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
-            self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'], 
-                                  [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
-                                  '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
             self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
                                    [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                    '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
@@ -384,7 +377,6 @@ class snp():
         else:
             # print error  
             pass  
-    
             
     def annotateVCF(self):
         """ Annotate the final VCF file """
@@ -395,14 +387,7 @@ class snp():
            self.__annotation = self.fOut + "/" + self.name +'_annotation.txt'
            self.__ifVerbose("parsing final Annotation.")
            self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Final_annotation.txt'],
-                              ['python', self.__parser, self.__annotation, self.name])
-
-           self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_Resistance_annotation.txt'],
-                                ['java', '-Xmx4g', '-jar', self.__annotator, 'NC_000962', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'])
-           self.__ifVerbose("parsing final Annotation.")
-           self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'],
-                              ['python', self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt', self.name])
-            
+                              ['python', self.__parser, self.__annotation, self.name, self.mutationloci])
         else:
             self.__ifVerbose("Use SamTools, GATK, or Freebayes to annotate the final VCF.")
     
@@ -426,7 +411,7 @@ class snp():
             elif "no concordance" in lined:
                 self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
         fh1.close()
-        fh2 = open(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt','r')
+        fh2 = open(self.fOut + "/" + self.name +'_Final_annotation.txt','r')
         for lines in fh2:
             lined = lines.rstrip("\r\n").split("\t")
             if lined[16] == "rrs":
@@ -453,7 +438,7 @@ class snp():
         i = datetime.now()
         self.__CallCommand(['coverage estimator', self.fOut + "/" + self.name + '_Coverage.txt'],
                             ['python', self.__coverage_estimator, samDir + '/coverage.txt'])
-        self.__CallCommand(['resistance region coverage estimator', self.fOut + "/" + self.name + '_Resistance_Region_Coverage.txt'],
+        self.__CallCommand(['genome region coverage estimator', self.fOut + "/" + self.name + '_genome_region_coverage.txt'],
                             ['python', self.__resis_parser, samDir + '/bed_sorted_coverage.txt', samDir + '/coverage.txt'])
         fh2 = open(self.fOut + "/" + self.name + '_Coverage.txt','r')
         for line in fh2:
@@ -463,30 +448,30 @@ class snp():
         if int(cov) < 10:
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
         fh2.close()                  
-        self.__CallCommand(['resistance loci deletion parser', self.fOut + "/" + self.name + '_Resistance_deletion.txt'],
-                            ['python', self.__del_parser, self.fOut + "/" + self.name, self.name])
-        fh3 = open(self.fOut + "/" + self.name + '_Resistance_deletion.txt','r')
+        self.__CallCommand(['loci deletion parser', self.fOut + "/" + self.name + '_deleted_loci.txt'],
+                            ['python', self.__del_parser, self.fOut + "/" + self.name, self.name, self.__bedlist])
+        fh3 = open(self.fOut + "/" + self.name + '_deleted_loci.txt','r')
         for line in fh3:
             fields = line.rstrip("\r\n").split("\t")
-            notes.append(fields[1])
+            notes.append(fields[9])
         for keys in notes:
-            if "deletion" in keys:
+            if "Complete" in keys or "Partial" in keys:
                dele = False
-        if dele == True:
+        if dele == False:
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "gene deletion inferred\n")
-        fh3.close() 
+           fh3.close()
+        else:
+          fh3.close()
+          self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name + '_Resistance_deletion.txt']) 
+         
 
     def cleanUp(self):
         """ Clean up the temporary files, and move them to a proper folder. """
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
         self.__CallCommand('rm', ['rm',  self.input])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
-        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
-        #self.__CallCommand('rm', ['rm',  self.__finalBam])
         self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
         self.__CallCommand('rm', ['rm',  self.kraken + "/kraken.txt"])
-       
-        
         if self.paired:
            self.__CallCommand('rm', ['rm',  self.input2])
         valiOut = self.fOut + "/validation"

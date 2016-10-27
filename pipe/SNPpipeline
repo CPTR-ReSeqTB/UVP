@@ -30,7 +30,7 @@ if __name__ == '__main__':
     group6 = parser.add_argument_group('Optional', '')
     group6.add_argument('-v', '--verbose', action='store_true', help='Produce status updates of the run.') 
     group6.add_argument('-h', '--help', action='help', help='Show this help message and exit')
-    group6.add_argument('--version', action='version', version='UVP v1.0.8', 
+    group6.add_argument('--version', action='version', version='%(prog)s v0.2', 
                         help='Show program\'s version number and exit')
    
 
@@ -98,6 +98,8 @@ if __name__ == '__main__':
     s.runVali()
     s.runKraken()
     s.runPrinseq()
+    
+    
     
     
     # Run the aligner

@@ -9,6 +9,8 @@ from string import join
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]
+input3 = sys.argv[3]
+
 
 position            = ""
 reference           = ""
@@ -48,6 +50,19 @@ gene_id1            = ""
 transcript1         = ""
 annotation_details1 = ""
 Block               = False
+(genez,start,stop,gene_anot,strand) = ([],[],[],[],[])
+nuc_change  = ""
+
+fh3 = open(input3,'r')
+for lines in fh3:
+    lined = lines.rstrip("\r\n").split("\t")
+    if lines.startswith("H37Rv"):
+       continue
+    genez.append(lined[0])
+    start.append(lined[1])
+    stop.append(lined[2])
+    gene_anot.append(lined[3])
+    strand.append(lined[4])
     
 fh1 = open(input1,'r')
 print "Sample ID" + "\t" + "CHROM" + "\t" + "POS" + "\t" + "REF" + "\t" + "ALT" + "\t" + "Read Depth" + "\t" + "Quality" + "\t" + "Percent Alt allele" + "\t" +  "Annotation" + "\t" + "Variant Type" + "\t" + "Nucleotide Change" + "\t" + "Position within CDS " + "\t" + "Amino acid change" + "\t" + "REF Amino acid" + "\t" + "ALT Amino Acid" + "\t" + "Codon Position" + "\t" "Gene name" + "\t" + "Gene ID" + "\t" + "Transcript ID" + "\t" + "Annotation details"  
@@ -75,152 +90,50 @@ for lines in fh1:
     subannot   = annot.split(",")
     smallannot = subannot[0].split("|")
     if smallannot[2] == "MODIFIER":
-       if "rrs" in annot and 1471845 < int(position) < 1473382 :
-           annotation         = 'Intragenic_variant'
-           nuc_change         = str(int(position) - 1471845)
-           if len(fields[4]) > len(fields[3]): 
-              variant = "Insertion"
-           elif len(fields[3]) > len(fields[4]):
-              variant = "Deletion"
+       for x in range(0,71):
+           if (int(start[x]) -1) < int(position) < (int(stop[x]) + 1):
+              annotation = gene_anot[x]
+              if genez[x] == 'rrs':
+                 nuc_change = str((int(position)) - (int(start[x]) - 1))
+                 gene_id = 'MTB000019'
+              elif genez[x] == 'rrl':
+                 nuc_change = str((int(position)) - (int(start[x]) - 1))
+                 gene_id = 'MTB000020'
+              elif strand[x] == 'forward':
+                 gene_id  =  genez[x]
+                 nuc_change = str((int(position)) - (int(stop[x]) + 1))
+              elif strand[x] == 'reverse':
+                   gene_id  =  genez[x]
+                   nuc_change = str((int(start[x]) -1) - int(position))
+              gene_name = genez[x]
+              nucleotide_change = "c." + nuc_change + reference + ">" + alternate
+              amino_acid_change  = 'NA'
+              if len(fields[4]) > len(fields[3]): 
+                 variant = "Insertion"
+              elif len(fields[3]) > len(fields[4]):
+                 variant = "Deletion"
+              else:
+                 variant = "SNP"
+              transcript         = 'NA'
+              transcript_pos     = 'NA'
+              orig_aacid         = 'NA'
+              new_aacid	         = 'NA'
+              codon_pos	         = 'NA'
+              annotation_details = ','.join(subannot[0:])
+              break               
            else:
-              variant = "SNP"
-           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
-           amino_acid_change  = 'NA'
-           gene_name          = 'rrs'
-           gene_id            = 'MTB000019'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[0:])
-       elif "rrl" in annot and 1473657 < int(position) < 1476495 :
-           annotation         = 'Intragenic_variant'
-           nuc_change         = str(int(position) - 1473657)
-           if len(fields[4]) > len(fields[3]): 
-              variant = "Insertion"
-           elif len(fields[3]) > len(fields[4]):
-              variant = "Deletion"
-           else:
-              variant = "SNP"
-           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
-           amino_acid_change  = 'NA'
-           gene_name          = 'rrl'
-           gene_id            = 'MTB000020'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[0:])
-       elif 1673338 < int(position) < 1673440 :
-           annotation         = 'Intragenic_variant'
-           nuc_change         = str(int(position) - 1673440)
-           if len(fields[4]) > len(fields[3]): 
-              variant = "Insertion"
-           elif len(fields[3]) > len(fields[4]):
-              variant = "Deletion"
-           else:
-              variant = "SNP"
-           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
-           amino_acid_change  = 'NA'
-           gene_name          = 'inhA promoter'
-           gene_id            = 'inhA promoter'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[0:])
-       elif 2289241 < int(position) < 2289282 :
-           annotation         = 'Intragenic_variant'
-           nuc_change         = str(2289241 - int(position))
-           if len(fields[4]) > len(fields[3]): 
-              variant = "Insertion"
-           elif len(fields[3]) > len(fields[4]):
-              variant = "Deletion"
-           else:
-              variant = "SNP"
-           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
-           amino_acid_change  = 'NA'
-           gene_name          = 'pncA promoter'
-           gene_id            = 'pncA promoter'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[0:])
-       elif 2715332 < int(position) < 2715384 :
-           annotation         = 'Intragenic_variant'
-           nuc_change         = str(2715332 - int(position))
-           if len(fields[4]) > len(fields[3]): 
-              variant = "Insertion"
-           elif len(fields[3]) > len(fields[4]):
-              variant = "Deletion"
-           else:
-              variant = "SNP"
-           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
-           amino_acid_change  = 'NA'
-           gene_name          = 'eis promoter'
-           gene_id            = 'eis promoter'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[0:])
-       elif 2725991 < int(position) < 2726193 :
-           annotation         = 'Intragenic_variant'
-           nuc_change         = str(int(position) - 2726193)
-           if len(fields[4]) > len(fields[3]): 
-              variant = "Insertion"
-           elif len(fields[3]) > len(fields[4]):
-              variant = "Deletion"
-           else:
-              variant = "SNP"
-           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
-           amino_acid_change  = 'NA'
-           gene_name          = 'aphC promoter'
-           gene_id            = 'aphC promoter'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[0:])
-       elif 3568679 < int(position) < 3569109 :
-           annotation         = 'Intragenic_variant'
-           nuc_change         = str(3568679 - int(position))
-           if len(fields[4]) > len(fields[3]): 
-              variant = "Insertion"
-           elif len(fields[3]) > len(fields[4]):
-              variant = "Deletion"
-           else:
-              variant = "SNP"
-           nucleotide_change  = "c." + nuc_change + reference + ">" + alternate
-           amino_acid_change  = 'NA'
-           gene_name          = 'whiB7 promoter'
-           gene_id            = 'whiB7 promoter'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[0:])
-       else:
-           annotation         = 'Non-Coding'
-           variant            = 'NA'
-           nucleotide_change  = smallannot[9]
-           amino_acid_change  = 'NA'
-           gene_name          = 'NA'
-           gene_id            = 'NA'
-           transcript         = 'NA'
-           transcript_pos     = 'NA'
-           orig_aacid         = 'NA'
-           new_aacid	  = 'NA'
-           codon_pos	  = 'NA'
-           annotation_details = ','.join(subannot[1:])
+                annotation         = 'Non-Coding'
+                variant            = 'NA'
+                nucleotide_change  = smallannot[9]
+                amino_acid_change  = 'NA'
+                gene_name          = 'NA'
+                gene_id            = 'NA'
+                transcript         = 'NA'
+                transcript_pos     = 'NA'
+                orig_aacid         = 'NA'
+                new_aacid	   = 'NA'
+                codon_pos	   = 'NA'
+                annotation_details = ','.join(subannot[1:])
        if len(position1) != 0:
           if Block == True:
               print  input2 + "\t"  + fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + 'MNV' + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + 'Block_Substitution' + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" + annotation_details1
@@ -317,4 +230,3 @@ if Block == True:
 else:
     print  input2 + "\t" + fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + variant1 + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + new_aacid1 + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1  + "\t" +  annotation_details1
 
-       
