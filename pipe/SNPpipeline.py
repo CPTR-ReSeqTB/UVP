@@ -7,92 +7,96 @@ import subprocess
 import os
 import types
 import gzip
+import yaml
+import ConfigParser
+import io
 from datetime import datetime
 
 class snp():
 
     def __init__(self, input, outdir, reference, name, paired,input2, verbose, argString):
-        self.name = name
-        self.fOut1 = "Output"
-        self.fOut = self.fOut1 + "/" + outdir
-        self.flog = "Master_log"
-        self.input = input
-        self.outdir = self.fOut + "/tmp"
-        self.tmp = self.outdir + "/tmp"
-        self.prinseq = self.fOut + "/prinseq"
-        self.qualimap = self.fOut + "/qualimap"
-        self.kraken = self.fOut + "/kraken"
-        #self.kvarq = self.fOut + "/kvarq"
-        self.paired = paired
-        self.input2 = input2
-        self.verbose = verbose
-        self.reference = reference
-        self.__finalVCF = ''
-        self.__annotation = ''
+        self.name               = name
+        self.fOut1              = "Output"
+        self.fOut               = self.fOut1 + "/" + outdir
+        self.flog               = "Master_log"
+        self.input              = input
+        self.outdir             = self.fOut + "/tmp"
+        self.tmp                = self.outdir + "/tmp"
+        self.prinseq            = self.fOut + "/prinseq"
+        self.qualimap           = self.fOut + "/qualimap"
+        self.kraken             = self.fOut + "/kraken"
+        self.paired             = paired
+        self.input2             = input2
+        self.verbose            = verbose
+        self.reference          = reference
+        self.__finalVCF         = ''
+        self.__annotation       = ''
         self.__final_annotation = ''
+        self.__unclear          = ''
+        self.__mixed            = ''
+        self.__low              = ''
 
-        # Make the output directory, and start the log file.
+        # Create the output directory, and start the log file.
         self.__logged = False
+
         if not os.path.isfile(self.fOut1):
            self.__CallCommand('mkdir', ['mkdir', self.fOut1])
+
         self.__CallCommand('mkdir', ['mkdir', self.fOut])
+
         if not os.path.isfile(self.flog):
            self.__CallCommand('mkdir', ['mkdir', self.flog])
+
         self.__CallCommand('mkdir', ['mkdir', '-p', self.tmp])
         self.__CallCommand('mkdir', ['mkdir', '-p', self.prinseq])
         self.__CallCommand('mkdir', ['mkdir', '-p', self.qualimap])
         self.__CallCommand('mkdir', ['mkdir', '-p', self.kraken])
-        #self.__CallCommand('mkdir', ['mkdir', '-p', self.kvarq])
-        self.__log = self.fOut + "/" + self.name + ".log"
+        self.__log     = self.fOut + "/" + self.name + ".log"
+
+        with open("/scicomp/home/krt7/pipe/config.yml", 'r') as ymlfile:
+             cfg       = yaml.load(ymlfile)
+
         self.__lineage = self.fOut + "/" + self.name + ".lineage_report.txt"
-        self.__logFH = open(self.__log, 'w')
+        self.__logFH   = open(self.__log, 'w')
         self.__logFH.write(argString + "\n\n")
-        #self.__logged = True
-        self.__mlog = self.flog + "/" + "master.log"
-        self.__logFH2 = open(self.__mlog, 'a')
-        #self.__logFH2.write(argString + "\n\n")
-        self.__logged = True
+        self.__mlog    = self.flog + "/" + "master.log"
+        self.__logFH2  = open(self.__mlog, 'a')
+        self.__logged  = True
 				
 	# Format Validation
-	self.__fastqval        = '/bin/fastQValidator'
-
+	self.__fastqval           = cfg['tools']['fastqvalidator']
         #fastq QC
-        self.__prinseq         = '/bin/prinseq-lite.pl'
-        self.__kraken          = '/KRAKEN/kraken'
-        self.__krakendb        = '/KRAKEN/minikraken'
-        self.__krakenreport    = '/KRAKEN/kraken-report'
-        self.__pigz            = '/bin/pigz'
-        self.__unpigz          = '/bin/unpigz'
-        
+        self.__prinseq            = cfg['tools']['prinseq']
+        self.__kraken             = cfg['directories']['kraken']
+        self.__krakendb           = cfg['directories']['krakendb']
+        self.__krakenreport       = cfg['directories']['krakenreport']
+        self.__pigz               = cfg['tools']['pigz']
+        self.__unpigz             = cfg['tools']['unpigz']
         # Mapping
-        self.__bwa      = '/bin/bwa'
-        self.__samtools = '/bin/samtools/samtools'
-        self.__qualimap = '/bin/qualimap_v2.1.1/qualimap'
-
-
+        self.__bwa                = cfg['tools']['bwa']
+        self.__samtools           = cfg['tools']['samtools']
+        self.__qualimap           = cfg['tools']['qualimap']
         # Picard-Tools
-        self.__picard     = '/bin/picard/picard.jar'
-
+        self.__picard             = cfg['tools']['picard']
         # SNP / InDel Calling
-        self.__gatk = '/bin/GenomeAnalysisTK.jar'
-        
+        self.__gatk               = cfg['tools']['gatk']
         # Other
-        self.__bcftools       = '/bin/bcftools/bcftools'
-        self.__vcfannotate    = '/bin/vcftools/bin/vcf-annotate'
-        self.__vcftools       = '/bin/vcftools/bin/vcftools'
-        self.__vcfutils       = '/bin/bcftools/vcfutils.pl' 
-        self.__annotator      = '/bin/snpEff/snpEff.jar' 
-        self.__parser         = '/bin/parse_annotation.py'
-        self.__lineage_parser = '/bin/lineage_parser.py'
-        self.__lineages       = '/bin/lineage_markers.txt'
-        self.__exclusion      = '/bin/loci_filtered.txt'
-        self.__excluded       = '/bin/excluded_loci.txt'
-        self.__coverage_estimator = '/bin/coverage_estimator.py'
-        self.resloci          = '/bin/included_loci.txt'
-        self.mutationloci     = '/bin/mutation_loci.txt'
-        self.__bedlist        = '/bin/bed_list.txt'     
-        self.__resis_parser   = '/bin/resis_parser.py'
-        self.__del_parser     = '/bin/del_parse.py'
+        self.__bcftools           = cfg['tools']['bcftools']
+        self.__vcfannotate        = cfg['tools']['vcfannotate']
+        self.__vcftools           = cfg['tools']['vcftools']
+        self.__vcfutils           = cfg['tools']['vcfutils'] 
+        self.__annotator          = cfg['tools']['annotator'] 
+        self.__parser             = cfg['scripts']['parser']
+        self.__lineage_parser     = cfg['scripts']['lineage_parser']
+        self.__lineages           = cfg['scripts']['lineages']
+        self.__excluded           = cfg['scripts']['excluded']
+        self.__coverage_estimator = cfg['scripts']['coverage_estimator']
+        self.resloci              = cfg['scripts']['resloci']
+        self.__bedlist            = cfg['scripts']['bedlist']     
+        self.__resis_parser       = cfg['scripts']['resis_parser']
+        self.__del_parser         = cfg['scripts']['del_parser']
+        self.mutationloci         = cfg['scripts']['mutationloci']
+        self.__threads            = cfg['other']['threads']
 
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
@@ -124,22 +128,16 @@ class snp():
         self.__ifVerbose("Validating Input file.")
         valiOut = self.fOut + "/validation"
         self.__CallCommand('mkdir', ['mkdir', '-p', valiOut]) 
-        """ Validates format and coverage of input fastq files """
-    	num_lines = sum(1 for line in gzip.open(self.input))
-        lines = int(num_lines)/4.0
-        
-        if self.paired:
-           num_lines2 = sum(1 for line in gzip.open(self.input2))
-           lines2 = int(num_lines)/4.0 	 			
+        """ Validates format of input fastq files """	 			
 	if self.paired:
-           self.__CallCommand(['fastQValidator', valiOut + "/result1.out"], [self.__fastqval, '--file', self.input])
-           self.__CallCommand(['fastQValidator', valiOut + "/result2.out"], [self.__fastqval, '--file', self.input2])
+           self.__CallCommand(['fastQValidator', valiOut + "/result1.out"], [self.__fastqval,'--file', self.input])
+           self.__CallCommand(['fastQValidator', valiOut + "/result2.out"], [self.__fastqval,'--file', self.input2])
            output1 = valiOut + "/result1.out"
            output2 = valiOut + "/result2.out"
            self.__CallCommand(['cat', valiOut + "/result.out"], ['cat', output1, output2])
            self.__CallCommand('rm', ['rm', output1, output2 ])
         else:  
-	   self.__CallCommand(['fastQValidator', valiOut + '/result.out'], [self.__fastqval, '--file', self.input])
+	   self.__CallCommand(['fastQValidator', valiOut + '/result.out'], [self.__fastqval,'--file', self.input])
         self.__CallCommand('mv', ['mv', valiOut + '/result.out', valiOut + '/Validation_report.txt'])	
 	output = valiOut + "/Validation_report.txt"
         fh2 = open (output, 'r')
@@ -149,25 +147,13 @@ class snp():
                comments = lined.split(":")
                if comments[2] != " FASTQ_SUCCESS":
                   self.__CallCommand('mv', ['mv', self.input, self.flog])
+                  self.__CallCommand('mv', ['mv', self.fOut, self.flog])
                   if self.paired:
                      self.__CallCommand('mv', ['mv', self.input2, self.flog])  
                   self.__logFH.write("Input not in fastq format\n")
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:  " + self.input + "\t" + "not in fastq format\n")
                   sys.exit(1)
-               if lines < 1000:
-                  self.__CallCommand('mv', ['mv', self.input, self.flog])
-                  self.__logFH.write("not enough read coverage\n")
-                  i = datetime.now()
-                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "not enough read coverage\n")
-                  if self.paired:
-                     if lines < 1000 or lines2 < 1000:
-                        self.__CallCommand('mv', ['mv', self.input2, self.flog])
-                        i = datetime.now()
-                        self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input2 + "\t" + "not enough read coverage\n")
-                        sys.exit(2)
-                  sys.exit(3)
-    
     """ Fastq QC """
     def runPrinseq(self):
         self.__ifVerbose("Performing prinseq QC.")
@@ -185,8 +171,8 @@ class snp():
                               '-out_good', self.prinseq + "/" + self.name + "good", 
                               '-out_bad', 'null', '-log', self.prinseq + "/" + self.name + "log"])
         if self.paired:
-           self.__CallCommand('pigz', [self.__pigz, '-p', '10', self.prinseq + "/" + self.name + "good" + "_1.fastq"])
-           self.__CallCommand('pigz', [self.__pigz, '-p', '10', self.prinseq + "/" + self.name + "good" + "_2.fastq"])
+           self.__CallCommand('pigz', [self.__pigz, '-p', self.__threads, self.prinseq + "/" + self.name + "good" + "_1.fastq"])
+           self.__CallCommand('pigz', [self.__pigz, '-p', self.__threads, self.prinseq + "/" + self.name + "good" + "_2.fastq"])
            self.__CallCommand('rm', ['rm', self.prinseq + "/" + self.name + "bad_1.fastq",
                                self.prinseq + "/" + self.name + "bad_2.fastq",
                                self.prinseq + "/" + self.name + "good_1_singletons.fastq",
@@ -209,14 +195,14 @@ class snp():
         if self.paired:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],['kraken', '--db', 
                                'standard', '--gzip-compressed', self.input, self.input2,
-                               '--paired', '--fastq-input', '--threads', '20', '--classified-out',
+                               '--paired', '--fastq-input', '--threads', self.__threads, '--classified-out',
                                 self.name + "_classified_Reads.fastq"])
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],['kraken-report', '--db',
                                'standard', self.kraken + "/kraken.txt"])
         else:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],['kraken', '--db', 
                                'standard', '--gzip-compressed', self.input, '--fastq-input', 
-                               '--threads', '12', '--classified-out', self.name + "_classified_Reads.fastq"])                     
+                               '--threads', self.__threads, '--classified-out', self.name + "_classified_Reads.fastq"])                     
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],['kraken-report', '--db',
                                'standard', self.kraken + "/kraken.txt"])
         krakenOut = self.kraken + "/final_report.txt"
@@ -228,6 +214,7 @@ class snp():
                cov += float(fields[0])
         if cov < 90:
            self.__CallCommand('mv', ['mv', self.input, self.flog])
+           self.__CallCommand('mv', ['mv', self.fOut, self.flog])
            self.__CallCommand('rm', ['rm', self.kraken + "/kraken.txt"])
            self.__logFH.write("not species specific\n")
            i = datetime.now()
@@ -268,12 +255,12 @@ class snp():
         """ Make use of bwa mem """
         if self.paired:
             self.__ifVerbose("   Running BWA mem on paired end reads.")
-            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem','-t','10','-R', 
+            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem','-t',self.__threads,'-R', 
                                "@RG\tID:" + self.name + "\tSM:" + self.name + "\tPL:ILLUMINA", 
                                 self.reference, self.input, self.input2])
         else:
             self.__ifVerbose("   Running BWA mem on single end reads.")
-            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem','-t', '10', '-R', 
+            self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem','-t', self.__threads, '-R', 
                                "@RG\tID:" + self.name + "\tSM:" + self.name + "\tPL:ILLUMINA", 
                                 self.reference, self.input])       
     
@@ -306,9 +293,11 @@ class snp():
                            'INPUT='+ GATKdir +'/GATK_s.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
                            'METRICS_FILE='+ GATKdir +'/MarkDupes.metrics', 'ASSUME_SORTED=true', 
                            'REMOVE_DUPLICATES=false', 'VALIDATION_STRINGENCY=LENIENT'])         
+        self.__ifVerbose("   Running AddOrReplaceReadGroups.")
         self.__ifVerbose("   Running BuildBamIndex.")
         self.__CallCommand('BuildBamIndex', ['java', '-Xmx8g', '-jar', self.__picard, 'BuildBamIndex',  
                            'INPUT='+ GATKdir +'/GATK_sdr.bam', 'VALIDATION_STRINGENCY=LENIENT'])
+
         """ Re-alignment around InDels using GATK """
         self.__ifVerbose("   Running RealignerTargetCreator.")
         self.__CallCommand('RealignerTargetCreator', ['java', '-Xmx32g', '-jar', self.__gatk, '-T', 
@@ -359,6 +348,9 @@ class snp():
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
                                ['vcf-annotate', '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
+            self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'], 
+                                  [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
+                                  '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
             self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
                                    [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                    '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
@@ -377,6 +369,7 @@ class snp():
         else:
             # print error  
             pass  
+    
             
     def annotateVCF(self):
         """ Annotate the final VCF file """
@@ -388,6 +381,13 @@ class snp():
            self.__ifVerbose("parsing final Annotation.")
            self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Final_annotation.txt'],
                               ['python', self.__parser, self.__annotation, self.name, self.mutationloci])
+
+           self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_Resistance_annotation.txt'],
+                                ['java', '-Xmx4g', '-jar', self.__annotator, 'NC_000962', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'])
+           self.__ifVerbose("parsing final Annotation.")
+           self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'],
+                              ['python', self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt', self.name, self.mutationloci])
+            
         else:
             self.__ifVerbose("Use SamTools, GATK, or Freebayes to annotate the final VCF.")
     
@@ -406,12 +406,15 @@ class snp():
             i = datetime.now()
             if "No Informative SNPs" in lined:
                 self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+                self.__unclear = "positive"
             elif "no precise lineage" in lined:
                 self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+                self.__mixed = "positive"
             elif "no concordance" in lined:
                 self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+                self.__mixed = "positive"
         fh1.close()
-        fh2 = open(self.fOut + "/" + self.name +'_Final_annotation.txt','r')
+        fh2 = open(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt','r')
         for lines in fh2:
             lined = lines.rstrip("\r\n").split("\t")
             if lined[16] == "rrs":
@@ -422,6 +425,7 @@ class snp():
                count3 += 1
         if count1 > 5 or count2 > 5 :
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "mixed species suspected\n")
+           self.__mixed = "positive"
         if count3 > 0:
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Block substitution inferred\n")
         fh2.close()
@@ -446,6 +450,7 @@ class snp():
                cov_str = line.split(":")
                cov = cov_str[1].strip(" ")
         if int(cov) < 10:
+           self.__low = "positive"
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
         fh2.close()                  
         self.__CallCommand(['loci deletion parser', self.fOut + "/" + self.name + '_deleted_loci.txt'],
@@ -462,7 +467,7 @@ class snp():
            fh3.close()
         else:
           fh3.close()
-          self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name + '_Resistance_deletion.txt']) 
+          self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name + '_deleted_loci.txt']) 
          
 
     def cleanUp(self):
@@ -470,13 +475,21 @@ class snp():
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
         self.__CallCommand('rm', ['rm',  self.input])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
+        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
+        #self.__CallCommand('rm', ['rm',  self.__finalBam])
         self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
         self.__CallCommand('rm', ['rm',  self.kraken + "/kraken.txt"])
+       
         if self.paired:
            self.__CallCommand('rm', ['rm',  self.input2])
         valiOut = self.fOut + "/validation"
         self.__CallCommand('rm', ['rm', '-r', self.prinseq])
-
+        if self.__mixed == "positive":
+           self.__CallCommand('mv', ['mv', self.fOut, self.flog])
+        if self.__unclear == "positive":
+           self.__CallCommand('mv', ['mv', self.fOut, self.flog])
+        if self.__low == "positive":
+           self.__CallCommand('mv', ['mv', self.fOut, self.flog])
     def __ifVerbose(self, msg):
         """ If verbose print a given message. """
         if self.verbose: print msg

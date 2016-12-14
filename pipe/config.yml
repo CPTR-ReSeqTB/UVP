@@ -1,0 +1,34 @@
+tools:
+    bcftools: /uvp/bin/bcftools/bcftools
+    vcfannotate: /uvp/bin/vcftools/bin/vcf-annotate
+    fastqvalidator: /uvp/bin/fastQValidator
+    bwa: /uvp/bin/bwa
+    samtools: /uvp/bin/samtools/samtools
+    qualimap: /uvp/bin/qualimap_v2.1.1/qualimap
+    pigz: /uvp/bin/pigz
+    unpigz: /uvp/bin/unpigz
+    prinseq: /uvp/bin/prinseq-lite.pl
+    picard: /uvp/bin/picard/picard.jar
+    gatk: /uvp/bin/GenomeAnalysisTK.jar
+    vcftools: /uvp/bin/vcftools/bin/vcftools
+    vcfutils: /uvp/bin/bcftools/vcfutils.pl 
+    annotator: /uvp/bin/snpEff/snpEff.jar
+        
+directories:
+    kraken: /KRAKEN/kraken
+    krakendb: /KRAKEN/minikraken
+    krakenreport: /KRAKEN/kraken-report
+
+scripts:
+    parser: /uvp/bin/parse_annotation.py
+    lineage_parser: /uvp/bin/lineage_parser.py
+    lineages: /uvp/bin/lineage_markers.txt
+    excluded: /uvp/bin/excluded_loci.txt
+    coverage_estimator: /uvp/bin/coverage_estimator.py
+    resloci: /uvp/bin/included_loci.txt
+    bedlist: /uvp/bin/bed_list.txt     
+    resis_parser: /uvp/bin/resis_parser.py
+    del_parser: /uvp/bin/del_parse.py
+    mutationloci: /uvp/bin/mutation_loci.txt
+other:
+    threads: '12'

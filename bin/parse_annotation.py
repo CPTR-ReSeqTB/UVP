@@ -148,7 +148,10 @@ for lines in fh1:
         else:
            annotation = 'Non-synonymous'
         nucleotide_change  = smallannot[9]
-        amino_acid_change  = smallannot[10]
+        if len(smallannot[10]) < 1:
+           amino_acid_change  = "NA"
+        else:
+           amino_acid_change  = smallannot[10]
         gene_name          = smallannot[3]
         gene_id            = smallannot[4]
         transcript         = smallannot[6]
