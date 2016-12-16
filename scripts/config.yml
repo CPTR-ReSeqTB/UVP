@@ -1,5 +1,6 @@
 tools:
     bcftools: /uvp/bin/bcftools/bcftools
+    bedtools: /uvp/bin/bedtools
     vcfannotate: /uvp/bin/vcftools/bin/vcf-annotate
     fastqvalidator: /uvp/bin/fastQValidator
     bwa: /uvp/bin/bwa

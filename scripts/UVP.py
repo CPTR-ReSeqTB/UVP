@@ -53,7 +53,7 @@ class snp():
         self.__CallCommand('mkdir', ['mkdir', '-p', self.kraken])
         self.__log     = self.fOut + "/" + self.name + ".log"
 
-        with open("/scicomp/home/krt7/pipe/config.yml", 'r') as ymlfile:
+        with open("/uvp/config.yml", 'r') as ymlfile:
              cfg       = yaml.load(ymlfile)
 
         self.__lineage = self.fOut + "/" + self.name + ".lineage_report.txt"
@@ -84,6 +84,7 @@ class snp():
         self.__bcftools           = cfg['tools']['bcftools']
         self.__vcfannotate        = cfg['tools']['vcfannotate']
         self.__vcftools           = cfg['tools']['vcftools']
+        self.__bedtools           = cfg['tools']['bedtools']
         self.__vcfutils           = cfg['tools']['vcfutils'] 
         self.__annotator          = cfg['tools']['annotator'] 
         self.__parser             = cfg['scripts']['parser']
@@ -193,18 +194,18 @@ class snp():
         valiOut = self.fOut + "/validation"
         self.__logFH.write("########## Running Kraken. ##########\n")
         if self.paired:
-           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],['kraken', '--db', 
-                               'standard', '--gzip-compressed', self.input, self.input2,
+           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
+                               self.__krankendb, '--gzip-compressed', self.input, self.input2,
                                '--paired', '--fastq-input', '--threads', self.__threads, '--classified-out',
                                 self.name + "_classified_Reads.fastq"])
-           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],['kraken-report', '--db',
-                               'standard', self.kraken + "/kraken.txt"])
+           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.krakenreport, '--db',
+                               self.__krakendb, self.kraken + "/kraken.txt"])
         else:
-           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],['kraken', '--db', 
-                               'standard', '--gzip-compressed', self.input, '--fastq-input', 
+           self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
+                               self.__krakendb, '--gzip-compressed', self.input, '--fastq-input', 
                                '--threads', self.__threads, '--classified-out', self.name + "_classified_Reads.fastq"])                     
-           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],['kraken-report', '--db',
-                               'standard', self.kraken + "/kraken.txt"])
+           self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
+                               self.__krakendb, self.kraken + "/kraken.txt"])
         krakenOut = self.kraken + "/final_report.txt"
         cov = 0
         fh1 = open(krakenOut,'r')
@@ -248,7 +249,7 @@ class snp():
         self.__CallCommand('bwa index', [self.__bwa, 'index', self.reference])
         self.__CallCommand('CreateSequenceDictionary', ['java', '-jar', self.__picard, 
                            'CreateSequenceDictionary', 'R='+self.reference,'O='+ out + "/ref.dict"])
-        self.__CallCommand('samtools faidx', ['samtools', 'faidx', self.reference ])
+        self.__CallCommand('samtools faidx', [self.__samtools, 'faidx', self.reference ])
 
     
     def __bwaLongReads(self, out):
@@ -318,7 +319,7 @@ class snp():
         """ Filter out unmapped reads """
         self.__finalBam = self.fOut + '/'+ self.name + '_sdrcsm.bam'
         self.__ifVerbose("   Running samtools view.")
-        self.__CallCommand('samtools view', ['samtools', 'view', '-bhF', '4', '-o', self.__finalBam, 
+        self.__CallCommand('samtools view', [self.__samtools, 'view', '-bhF', '4', '-o', self.__finalBam, 
                            GATKdir +'/GATK_sdrcs.bam'])
         self.__ifVerbose("   Running BuildBamIndex.")
         self.__CallCommand('BuildBamIndex', ['java', '-Xmx4g', '-jar', self.__picard, 'BuildBamIndex', 'INPUT='+ self.__finalBam, 
@@ -337,17 +338,17 @@ class snp():
 
             """ Call SNPs / InDels using mpileup, bcftools, vcfutils. """
             self.__ifVerbose("   Running samtools mpileup.")
-            self.__CallCommand(['samtools mpileup', samDir + '/samtools.mpileup'], ['samtools', 'mpileup', '-Q', '20', '-q', '20', '-t', 'DP,DV,DPR', 
+            self.__CallCommand(['samtools mpileup', samDir + '/samtools.mpileup'], [self.__samtools, 'mpileup', '-Q', '20', '-q', '20', '-t', 'DP,DV,DPR', 
                                '-ugf', self.reference, self.__finalBam])
             self.__ifVerbose("   Running bcftools view.")
             self.__CallCommand(['bcftools view', samDir + '/samtools.vcf'], 
-                               ['bcftools', 'call', '-vcf', 'GQ', samDir + '/samtools.mpileup'])
+                               [self.__bcftools, 'call', '-vcf', 'GQ', samDir + '/samtools.mpileup'])
             self.__ifVerbose("   Running vcfutils.pl varFilter.")
             self.__CallCommand(['vcfutils.pl varFilter', samDir +'/SamTools.vcf'], 
                                [self.__vcfutils, 'varFilter', '-D1500', samDir + '/samtools.vcf'])
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
-                               ['vcf-annotate', '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
+                               [self.__vcfannotate, '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
             self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'], 
                                   [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                   '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
@@ -356,9 +357,9 @@ class snp():
                                    '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
             self.__CallCommand('mv', ['mv', samDir + '/samtools.mpileup', self.fOut + "/" + self.name + '.mpileup'])
             self.__CallCommand(['samtools depth', samDir + '/coverage.txt'],
-                                ['samtools','depth', self.__finalBam])
+                                [self.__samtools,'depth', self.__finalBam])
             self.__CallCommand(['bedtools coverage', samDir + '/bed_coverage.txt' ],
-                                ['bedtools','coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
+                                [self.__bedtools,'coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
             self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
                                 ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])                 
             
@@ -369,8 +370,7 @@ class snp():
         else:
             # print error  
             pass  
-    
-            
+           
     def annotateVCF(self):
         """ Annotate the final VCF file """
         if self.__finalVCF:
@@ -429,7 +429,6 @@ class snp():
         if count3 > 0:
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Block substitution inferred\n")
         fh2.close()
-        
       
     def runCoverage(self):
         """ Run Genome Coverage Statistics """
@@ -476,7 +475,6 @@ class snp():
         self.__CallCommand('rm', ['rm',  self.input])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
-        #self.__CallCommand('rm', ['rm',  self.__finalBam])
         self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
         self.__CallCommand('rm', ['rm',  self.kraken + "/kraken.txt"])
        
