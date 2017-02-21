@@ -5,10 +5,11 @@ tools:
     fastqvalidator: /uvp/bin/fastQValidator
     bwa: /uvp/bin/bwa
     samtools: /uvp/bin/samtools/samtools
-    qualimap: /uvp/bin/qualimap_v2.1.1/qualimap
+    qualimap: /uvp/bin/qualimap/qualimap
     pigz: /uvp/bin/pigz
     unpigz: /uvp/bin/unpigz
     prinseq: /uvp/bin/prinseq-lite.pl
+    fastqc: /uvp/bin/FastQC/fastqc
     picard: /uvp/bin/picard/picard.jar
     gatk: /uvp/bin/GenomeAnalysisTK.jar
     vcftools: /uvp/bin/vcftools/bin/vcftools
@@ -17,7 +18,7 @@ tools:
         
 directories:
     kraken: /KRAKEN/kraken
-    krakendb: /KRAKEN/minikraken
+    krakendb: /KRAKEN/customdb
     krakenreport: /KRAKEN/kraken-report
 
 scripts:
@@ -31,5 +32,6 @@ scripts:
     resis_parser: /uvp/bin/resis_parser.py
     del_parser: /uvp/bin/del_parse.py
     mutationloci: /uvp/bin/mutation_loci.txt
+    snplist: /uvp/bin/snps.vcf
 other:
     threads: '12'

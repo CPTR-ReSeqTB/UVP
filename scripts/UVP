@@ -30,7 +30,7 @@ if __name__ == '__main__':
     group6 = parser.add_argument_group('Optional', '')
     group6.add_argument('-v', '--verbose', action='store_true', help='Produce status updates of the run.') 
     group6.add_argument('-h', '--help', action='help', help='Show this help message and exit')
-    group6.add_argument('--version', action='version', version='%(prog)s v2.1.0', 
+    group6.add_argument('--version', action='version', version='%(prog)s v2.1.2', 
                         help='Show program\'s version number and exit')
    
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         callers = 0
         if args.gatk: callers += 1
         if args.samtools: callers += 1   
-        if not callers: args.samtools = True
+        if not callers: args.gatk = True
     
     # If no outdir, use the given name as the outdir
     if not args.outdir:
@@ -97,8 +97,7 @@ if __name__ == '__main__':
                         args.verbose, ' '.join(sys.argv))
     s.runVali()
     s.runKraken()
-    s.runPrinseq()
-    
+    s.runFastQC()
     
     
     

@@ -76,9 +76,11 @@ for lines in fh1:
     alternate = fields[4]
     quality = fields[5]
     rarr = fields[9].split(":")
+    num_all_array = rarr[1].split(",")
+    num_all_2 = num_all_array[1]
     read_depth = rarr[2]
     num_all = rarr[3]
-    perc_alt1 = float(num_all)/float(read_depth)*100.0
+    perc_alt1 = float(num_all_2)/float(read_depth)*100.0
     perc_alt = "{0:.2f}".format(perc_alt1)
     if float(read_depth) < 10.0:
        continue
