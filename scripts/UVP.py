@@ -313,7 +313,7 @@ class snp():
         """ Filter out unmapped reads """
         self.__finalBam = self.fOut + '/'+ self.name + '_sdrcsm.bam'
         self.__ifVerbose("   Running samtools view.")
-        self.__CallCommand('samtools view', ['samtools', 'view', '-bhF', '4', '-o', self.__finalBam, 
+        self.__CallCommand('samtools view', [self.__samtools, 'view', '-bhF', '4', '-o', self.__finalBam, 
                            GATKdir +'/GATK_sdrcs.bam'])
         self.__ifVerbose("   Running BuildBamIndex.")
         self.__CallCommand('BuildBamIndex', ['java', '-Xmx8g', '-jar', self.__picard, 'BuildBamIndex', 'INPUT='+ self.__finalBam, 
@@ -350,7 +350,7 @@ class snp():
             self.__CallCommand(['samtools depth', samDir + '/coverage.txt'],
                                 [self.__samtools,'depth', self.__finalBam])
             self.__CallCommand(['bedtools coverage', samDir + '/bed_coverage.txt' ],
-                                ['bedtools','coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
+                                [self.__bedtools,'coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
             self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
                                 ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])
 
@@ -393,7 +393,7 @@ class snp():
             self.__CallCommand(['samtools depth', samDir + '/coverage.txt'],
                                 [self.__samtools,'depth', self.__finalBam])
             self.__CallCommand(['bedtools coverage', samDir + '/bed_coverage.txt' ],
-                                ['bedtools','coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
+                                [self.__bedtools,'coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
             self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
                                 ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])                 
             
