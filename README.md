@@ -10,6 +10,8 @@ Bcftools Version 1.2
 
 BWA Version 0.7.12
 
+FastQC Version 0.11.5
+
 Fastqvalidator Version 1.0.5
 
 GATK Version 3.4.0
