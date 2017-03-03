@@ -1,4 +1,4 @@
-# SNPpipe
+# UVP
 
 Set of scripts for analyzing NGS data
 
