@@ -12,7 +12,6 @@ input2 = sys.argv[2]
 input3 = sys.argv[3]
 input4 = sys.argv[4]
 
-
 fh1 = open(input1, 'r')
 sublinn = ""
 (lineage,position,ref,alt) = ([],[],[],[])
@@ -69,7 +68,6 @@ for lines in fh2:
                    discord1 += 1
                 else:
                   concord1 += 1
-
 fh2.close()
 
 fh3 = open(input3,'w')
@@ -115,29 +113,34 @@ if len(prevlin) == 0:
          print "No Informative SNPs detected"
          print >> fh3, "No Informative SNPs detected"
 else:
-     for i in range(0,len(prevlin) - 1):
-         if prevlin[i - 1] != prevlin[i]:
-            discordance = True
-     if discordance == True:
-        print "no concordance between predicted lineage and sublineage(s)"
-        print >> fh3, "no concordance between predicted lineage and sublineage(s)"
-        sys.exit(1) 
+     if len(prevlin) > 1: 
+        for i in range(1,len(prevlin) - 1):
+            if prevlin[i - 1] != prevlin[i]:
+               discordance = True
+        if discordance == True:
+           print "no concordance between predicted lineage and sublineage(s)"
+           print >> fh3, "no concordance between predicted lineage and sublineage(s)"
+           sys.exit(1) 
      else:
         if len(sublinn) < 1: 
            print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
            print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "NA" 
         elif len(sublinn) > 1:
-           print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
-           if sublinn.startswith('BOV_A'):
-              print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "NA"
-           else: 
-              print "Sub-lineage: " + sublinn
-              print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + sublinn
-
-              
-     
-
-
-
-         
+           for i in range(0,len(prevsub)): 
+             split_lin = prevsub[i].split(".")
+             if split_lin[0] != prevlin[0] and split_lin[0] != 'BOV_AFRI':
+               discordance = True
+             if split_lin[0] != split_first[0]:
+               discordance = True
+           if discordance:
+              print "no precise lineage inferred"
+              print >> fh3, "no precise lineage inferred"
+              sys.exit(1)
+           else:
+              print "Lineage: " + prevlin[0] + " " + tribes[int(prevlin[0])]
+              if sublinn.startswith('BOV_A'):
+                 print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + "NA"
+              else: 
+                 print "Sub-lineage: " + sublinn
+                 print >> fh3, input4 + "\t" +  prevlin[0] + "\t" + tribes[int(prevlin[0])] + "\t" + sublinn
 
