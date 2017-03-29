@@ -500,7 +500,6 @@ class snp():
             if "Complete" in keys or "Partial" in keys:
                dele = False
         if dele == False:
-           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "gene deletion inferred\n")
            fh3.close()
         else:
           fh3.close()
