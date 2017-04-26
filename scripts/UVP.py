@@ -486,7 +486,7 @@ class snp():
             if line.startswith("Average"):
                cov_str = line.split(":")
                cov = cov_str[1].strip(" ")
-        if int(cov) < 10:
+        if cov != '' and int(cov) < 10:
            self.__low = "positive"
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
         fh2.close()                  
@@ -519,6 +519,14 @@ class snp():
            self.__CallCommand('mv', ['mv', self.fOut, self.flog])
         if self.__low == "positive":
            self.__CallCommand('mv', ['mv', self.fOut, self.flog])
+        if os.path.isfile(self.fOut + "/" + self.name + '.log'):
+           fh4 = open(self.fOut + "/" + self.name + '.log','r')
+           for line in fh4:
+               lines = line.rstrip("\r\n")
+               if "Exception" in lines:
+                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Exception in analysis\n")
+                  self.__CallCommand('mv', ['mv', self.fOut, self.flog])
+                  fh4.close()
     def __ifVerbose(self, msg):
         """ If verbose print a given message. """
         if self.verbose: print msg
