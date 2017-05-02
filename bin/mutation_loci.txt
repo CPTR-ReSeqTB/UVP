@@ -55,7 +55,7 @@ dfrA upstream	3073610	3073679	intergenic	reverse
 thyA upstream	3074472	3074635	intergenic	reverse
 ald upstream	3086755	3086819	intergenic	forward
 gpsI upstream	3092598	3092950	intergenic	reverse
-dacB2 upstream	3218271	3218338		forward
+dacB2 upstream	3218271	3218338	intergenic	forward
 ddlA upstream	3337918	3337994	intergenic	reverse
 serB2 upstream	3403163	3403199	intergenic	reverse
 mymA upstream	3448427	3448503	intergenic	forward
