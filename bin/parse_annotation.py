@@ -81,6 +81,8 @@ for lines in fh1:
     read_depth = rarr[2]
     num_all = rarr[3]
     perc_alt1 = float(num_all_2)/float(read_depth)*100.0
+    if perc_alt1 > 100.0:
+       perc_alt1 = 100.0
     perc_alt = "{0:.2f}".format(perc_alt1)
     if float(read_depth) < 10.0:
        continue
