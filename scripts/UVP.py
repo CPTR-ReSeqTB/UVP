@@ -179,6 +179,7 @@ class snp():
     """ Species specificity check """
     def runKraken(self):
         self.__ifVerbose("Running Kraken.")
+        cwd = os.getcwd()
         valiOut = self.fOut + "/validation"
         self.__logFH.write("########## Running Kraken. ##########\n")
         if self.paired:
@@ -194,6 +195,7 @@ class snp():
                                '--threads', self.__threads, '--classified-out', self.name + "_classified_Reads.fastq"])                     
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
                                self.__krakendb, self.kraken + "/kraken.txt"])
+        self.__CallCommand('rm', ['rm',  cwd + "/" + self.name + "_classified_Reads.fastq"])
         krakenOut = self.kraken + "/final_report.txt"
         cov = 0
         fh1 = open(krakenOut,'r')
@@ -406,6 +408,7 @@ class snp():
        
     def annotateVCF(self):
         """ Annotate the final VCF file """
+        cwd = os.getcwd()
         if self.__finalVCF:
            self.__ifVerbose("Annotating final VCF.")
            self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_annotation.txt'],
@@ -428,6 +431,8 @@ class snp():
                               ['python', self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt', self.name, self.mutationloci])
         else:
             self.__ifVerbose("Use SamTools, GATK, or Freebayes to annotate the final VCF.")
+        self.__CallCommand('rm', ['rm',  cwd + "/snpEff_genes.txt"])
+        self.__CallCommand('rm', ['rm',  cwd + "/snpEff_summary.html"])
 
     def runLineage(self):
         """ Run lineage Analysis """
