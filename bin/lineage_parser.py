@@ -40,7 +40,7 @@ fh2 = open(input2,'r')
 for lines in fh2:
     count += 1
     fields = lines.rstrip("\r\n").split("\t")
-    if fields[2] == '1759252' or fields[2] == '931123':
+    if fields[2] == '1759252':
        linfour = fields[2]
     if fields[2] == '2831482':
        BOV = fields[2]
