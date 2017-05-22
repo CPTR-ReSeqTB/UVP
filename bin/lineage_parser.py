@@ -22,6 +22,7 @@ tribes = ["lineages","Indo-Oceanic","East-Asian","East-African-Indian","Euro-Ame
 discordance = False
 sublinneage = False
 linfour = ""
+hrv37 = ""
 BOV = ""
 BOV_AFRI = ""
 
@@ -40,8 +41,10 @@ fh2 = open(input2,'r')
 for lines in fh2:
     count += 1
     fields = lines.rstrip("\r\n").split("\t")
-    if fields[2] == '1759252':
+    if fields[2] == '931123':
        linfour = fields[2]
+    if fields[2] == '1759252':
+       hrv37 = fields[2]
     if fields[2] == '2831482':
        BOV = fields[2]
     if fields[2] == '1882180':
@@ -98,13 +101,14 @@ if len(prevlin) == 0:
             print "Lineage: " + split_first[0] + " :  " + tribes[int(split_first[0])]
             print "Sub-lineage: " + sublinn
             print >> fh3, input4 + "\t" + split_first[0] + "\t" + tribes[int(split_first[0])] + "\t" + sublinn
-         elif len(linfour) > 2 :
-            print "SNP" + " " + linfour + "  suggests sublineage 4.9"
+         elif len(linfour) < 2:
+            print "Absence of SNP 931123 suggests lineage 4"
             print "Lineage: " + "4" + " :  " + "Euro-American"
-            print >> fh3, input4 + "\t" + "4" + "\t" + "Euro American" + "\t" + "4.9"
-         elif 5 < count < 600:
-            print "Lineage: " + "4" + " :  " + "Euro-American"
-            print >> fh3, input4 + "\t" + "4" + "\t" + "Euro American" + "\t" + "NA"  
+            if len(hrv37) > 2:
+               print >> fh3, input4 + "\t" + "4" + "\t" + "Euro American" + "\t" + "NA"
+            elif len(hrv37) < 2:
+               print "Absence of SNP 1759252 suggests sublineage 4.9"
+               print >> fh3, input4 + "\t" + "4" + "\t" + "Euro American" + "\t" + "4.9"  
          else:
             print "No Informative SNPs detected"
             print >> fh3, "No Informative SNPs detected"
