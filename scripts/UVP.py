@@ -60,6 +60,7 @@ class snp():
         self.__logFH   = open(self.__log, 'w')
         self.__logFH.write(argString + "\n\n")
         self.__mlog    = self.flog + "/" + "master.log"
+        self.__qlog    = self.flog + "/" + "low_quals.txt"
         self.__logFH2  = open(self.__mlog, 'a')
         self.__logged  = True
 				
@@ -89,6 +90,7 @@ class snp():
         self.__annotator          = cfg['tools']['annotator'] 
         self.__parser             = cfg['scripts']['parser']
         self.__lineage_parser     = cfg['scripts']['lineage_parser']
+        self.__vcf_parser         = cfg['scripts']['vcf_parser']
         self.__lineages           = cfg['scripts']['lineages']
         self.__excluded           = cfg['scripts']['excluded']
         self.__coverage_estimator = cfg['scripts']['coverage_estimator']
@@ -443,36 +445,44 @@ class snp():
         count1 = 0
         count2 = 0
         count3 = 0
-        fh1 = open(self.__lineage,'r')
-        for line in fh1:
-            lined = line.rstrip("\r\n")
-            i = datetime.now()
-            if "No Informative SNPs" in lined:
-                self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
-                self.__unclear = "positive"
-            elif "no precise lineage" in lined:
-                self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
-                self.__mixed = "positive"
-            elif "no concordance" in lined:
-                self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
-                self.__mixed = "positive"
-        fh1.close()
-        fh2 = open(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt','r')
-        for lines in fh2:
-            lined = lines.rstrip("\r\n").split("\t")
-            if lined[16] == "rrs":
+
+        if os.path.isfile(self.__lineage):
+           fh1 = open(self.__lineage,'r')
+           for line in fh1:
+               lined = line.rstrip("\r\n")
+               i = datetime.now()
+               if "No Informative SNPs" in lined:
+                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+                  self.__unclear = "positive"
+               elif "no precise lineage" in lined:
+                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+                  self.__mixed = "positive"
+               elif "no concordance" in lined:
+                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+                  self.__mixed = "positive"
+           fh1.close()
+        if os.path.isfile(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'):
+           fh2 = open(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt','r')
+           for lines in fh2:
+             lined = lines.rstrip("\r\n").split("\t")
+             if lined[16] == "rrs":
                count1 += 1
-            elif lined[16] == "rrl":
+             elif lined[16] == "rrl":
                count2 += 1
-            if lined[9] == "MNV":
+             if lined[9] == "MNV":
                count3 += 1
-        if count1 > 5 or count2 > 5 :
-           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "mixed species suspected\n")
-           self.__mixed = "positive"
-        if count3 > 0:
-           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Block substitution inferred\n")
-        fh2.close()
-        
+           if count1 > 5 or count2 > 5 :
+              self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "mixed species suspected\n")
+              self.__mixed = "positive"
+           fh2.close()
+        if os.path.isfile(self.fOut + "/" + self.name +'_Final_annotation.txt'):
+           if os.path.isfile(self.fOut + "/" + self.name +'_GATK.vcf'):
+              self.__CallCommand('vcf_parser', ['python', self.__vcf_parser, self.fOut + "/" + self.name +'_Final_annotation.txt',
+                                                self.fOut + "/" + self.name +'_GATK.vcf', self.__qlog])
+           elif os.path.isfile(self.fOut + "/" + self.name +'_SamTools.vcf'):
+               self.__CallCommand('vcf_parser', ['python', self.__vcf_parser, self.fOut + "/" + self.name +'_Final_annotation.txt',
+                                                self.fOut + "/" + self.name +'_SamTools.vcf', self.__qlog])
+
     def runCoverage(self):
         """ Run Genome Coverage Statistics """
         cov = ""
@@ -486,29 +496,38 @@ class snp():
                             ['python', self.__coverage_estimator, samDir + '/coverage.txt'])
         self.__CallCommand(['genome region coverage estimator', self.fOut + "/" + self.name + '_genome_region_coverage.txt'],
                             ['python', self.__resis_parser, samDir + '/bed_sorted_coverage.txt', samDir + '/coverage.txt'])
-        fh2 = open(self.fOut + "/" + self.name + '_Coverage.txt','r')
-        for line in fh2:
-            if line.startswith("Average"):
-               cov_str = line.split(":")
-               cov = cov_str[1].strip(" ")
-        if cov != '' and int(cov) < 10:
-           self.__low = "positive"
-           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
-        fh2.close()                  
-        self.__CallCommand(['loci deletion parser', self.fOut + "/" + self.name + '_deleted_loci.txt'],
+
+        if os.path.isfile(self.fOut + "/" + self.name + '_Coverage.txt'):
+           fh2 = open(self.fOut + "/" + self.name + '_Coverage.txt','r')
+           for line in fh2:
+               if line.startswith("Average"):
+                  cov_str = line.split(":")
+                  cov = cov_str[1].strip(" ")
+               if line.startswith("Percentage"):
+                wid_str = line.split(":")
+                wid = wid_str[1].strip(" ")
+           if cov != '' and int(cov) < 10:
+              self.__low = "positive"
+              self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
+           if wid != '' and float(wid) < 94.99:
+            self.__low = "positive"
+            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage width\n")
+           fh2.close()                  
+           self.__CallCommand(['loci deletion parser', self.fOut + "/" + self.name + '_deleted_loci.txt'],
                             ['python', self.__del_parser, self.fOut + "/" + self.name, self.name, self.__bedlist])
-        fh3 = open(self.fOut + "/" + self.name + '_deleted_loci.txt','r')
-        for line in fh3:
-            fields = line.rstrip("\r\n").split("\t")
-            notes.append(fields[9])
-        for keys in notes:
-            if "Complete" in keys or "Partial" in keys:
+        if os.path.isfile(self.fOut + "/" + self.name + '_deleted_loci.txt'):
+           fh3 = open(self.fOut + "/" + self.name + '_deleted_loci.txt','r')
+           for line in fh3:
+             fields = line.rstrip("\r\n").split("\t")
+             notes.append(fields[9])
+           for keys in notes:
+             if "Complete" in keys or "Partial" in keys:
                dele = False
-        if dele == False:
-           fh3.close()
-        else:
-          fh3.close()
-          self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name + '_deleted_loci.txt']) 
+           if dele == False:
+             fh3.close()
+           else:
+             fh3.close()
+             self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name + '_deleted_loci.txt']) 
          
     def cleanUp(self):
         """ Clean up the temporary files, and move them to a proper folder. """

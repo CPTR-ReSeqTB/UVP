@@ -24,6 +24,7 @@ directories:
 scripts:
     parser: /uvp/bin/parse_annotation.py
     lineage_parser: /uvp/bin/lineage_parser.py
+    vcf_parser: /scicomp/home/krt7/binary/raw_vcf_parse.py
     lineages: /uvp/bin/lineage_markers.txt
     excluded: /uvp/bin/excluded_loci.txt
     coverage_estimator: /uvp/bin/coverage_estimator.py
