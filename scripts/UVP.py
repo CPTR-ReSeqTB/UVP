@@ -36,6 +36,7 @@ class snp():
         self.__unclear          = ''
         self.__mixed            = ''
         self.__low              = ''
+        self.__exception        = ''
 
         # Create the output directory, and start the log file.
         self.__logged = False
@@ -326,7 +327,6 @@ class snp():
         self.__CallCommand('rm', ['rm', '-r', self.tmp])
     
     """ Callers """
-
     def runGATK(self):
         if os.path.isfile(self.__finalBam):
             self.__ifVerbose("Calling SNPs/InDels with GATK.")
@@ -357,9 +357,7 @@ class snp():
                                 [self.__bedtools,'coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
             self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
                                 ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])
-
             """ Set final VCF file. """
-            
             if not self.__finalVCF: 
                 self.__finalVCF = self.fOut + "/" + self.name +'_GATK_filtered.vcf'
         else:
@@ -528,9 +526,10 @@ class snp():
            else:
              fh3.close()
              self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name + '_deleted_loci.txt']) 
-         
+
     def cleanUp(self):
         """ Clean up the temporary files, and move them to a proper folder. """
+        i = datetime.now()
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
@@ -544,13 +543,17 @@ class snp():
         if self.__low == "positive":
            self.__CallCommand('mv', ['mv', self.fOut, self.flog])
         if os.path.isfile(self.fOut + "/" + self.name + '.log'):
-           fh4 = open(self.fOut + "/" + self.name + '.log','r')
+           self.__logFH.close()
+           self.__logged = False
+           fh4 = open(self.__log,'r')
            for line in fh4:
                lines = line.rstrip("\r\n")
                if "Exception" in lines:
-                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Exception in analysis\n")
-                  self.__CallCommand('mv', ['mv', self.fOut, self.flog])
-                  fh4.close()
+                  self.__exception = "positive"
+           fh4.close()        
+        if self.__exception == "positive":
+           self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Exception in analysis\n")
+           self.__CallCommand('mv', ['mv', self.fOut, self.flog])
     def __ifVerbose(self, msg):
         """ If verbose print a given message. """
         if self.verbose: print msg
