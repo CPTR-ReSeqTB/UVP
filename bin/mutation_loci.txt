@@ -71,3 +71,12 @@ embA upstream	4243148	4243232	intergenic	forward
 ubiA upstream	4269834	4269839	intergenic	reverse
 ethA upstream	4327474	4327548	intergenic	reverse
 gidB upstream	4408203	4408333	intergenic	reverse
+ppsA upstream	3243697	3245444	CDS	forward
+mas upstream	3282716	3283334	intergenic	reverse
+Rv0191 upstream	222162	222288	intergenic	forward
+Rv3008 upstream	3366451	3366643	intergenic	forward
+Rv1667c upstream	1894231	1895342	CDS	reverse
+proZ upstream	4202614	4203299	CDS	reverse
+clpC1 upstream	4040705	4040878	intergenic	reverse
+atpC upstream	1467302	1467314	intergenic	forward
+crfA upstream	2718173	2718664	CDS	forward			
