@@ -94,7 +94,7 @@ for lines in fh1:
     subannot   = annot.split(",")
     smallannot = subannot[0].split("|")
     if smallannot[2] == "MODIFIER":
-       for x in range(0,80):
+       for x in range(0,81):
            if (int(start[x]) -1) < int(position) < (int(stop[x]) + 1):
               annotation = gene_anot[x]
               if genez[x] == 'rrs':
@@ -103,6 +103,9 @@ for lines in fh1:
               elif genez[x] == 'rrl':
                  nuc_change = str((int(position)) - (int(start[x]) - 1))
                  gene_id = 'MTB000020'
+              elif genez[x] == 'crfA':
+                 nuc_change = str((int(position)) - (int(start[x]) - 1))
+                 gene_id = 'crfA'
               elif strand[x] == 'forward':
                  gene_id  =  genez[x]
                  nuc_change = str((int(position)) - (int(stop[x]) + 1))
