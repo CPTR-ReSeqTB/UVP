@@ -159,23 +159,20 @@ class snp():
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:  " + self.input + "\t" + "not in fastq format\n")
                   sys.exit(1)
-
-    """ Fastq QC """
+""" Fastq QC """
     def runFastQC(self):
+        i = datetime.now()
         self.__ifVerbose("Performing  FastQC.")
         self.__CallCommand('fastqc', [self.__fastqc, '--extract', '-t', self.__threads, '-o', self.fastqc, self.input])
         fastqname = os.path.basename(self.input)
         fastqcinput = fastqname.replace(".fastq.gz","_fastqc")
-        fastqcOut = self.fastqc + "/" + fastqcinput + "/fastqc_data.txt"
+        fastqcOut = self.fastqc + "/" + fastqcinput + "/summary.txt"
         fh1 = open(fastqcOut, 'r')
         for line in fh1:
-            lined = line.rstrip("\r\n")
-            if lined.startswith(">>Basic"):
-               fields = lined.split('\t')
-               if fields[1] != 'pass':
-                  i = datetime.now()
+            lined = line.rstrip("\r\n").split('\t')
+            if 'FAIL' in lined[0]:
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "Fastq file QC flag\n")
-            break
+                  break
         fh1.close()
         self.__CallCommand('rm', ['rm', '-r', self.fastqc + "/" + fastqcinput])
 
