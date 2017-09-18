@@ -94,7 +94,7 @@ for lines in fh1:
     subannot   = annot.split(",")
     smallannot = subannot[0].split("|")
     if smallannot[2] == "MODIFIER":
-       for x in range(0,81):
+       for x in range(0,82):
            if (int(start[x]) -1) < int(position) < (int(stop[x]) + 1):
               annotation = gene_anot[x]
               if genez[x] == 'rrs':
