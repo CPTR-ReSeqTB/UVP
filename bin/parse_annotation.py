@@ -147,7 +147,7 @@ for lines in fh1:
               Block = False
           else:
               print  input2 + "\t" + fields[0] + "\t" + position1 + "\t" + reference1 + "\t" + alternate1 + "\t" + read_depth1 + "\t" + quality1 + "\t" + perc_alt11 + "\t" + annotation1 + "\t" + variant1 + "\t" + nucleotide_change1 + "\t" + transcript_pos1 + "\t" + amino_acid_change1 + "\t" + orig_aacid1 + "\t" + new_aacid1 + "\t" + codon_pos1 + "\t" + gene_name1 + "\t" + gene_id1 + "\t" + transcript1 + "\t" +  annotation_details1
-       
+        
     else:
         
         if smallannot[10][2:5] == smallannot[10][-3:]:
@@ -204,7 +204,33 @@ for lines in fh1:
                new_aacid  = smallannot[10][-3:]
             transcript_pos = re.findall(r'\d+', smallannot[9])[0]
             codon_pos = re.findall(r'\d+', smallannot[10])[0]
-        
+
+        for x in range(0,82):
+           if (int(start[x]) -1) < int(position) < (int(stop[x]) + 1):
+              annotation = gene_anot[x]    
+              if strand[x] == 'forward':
+                 gene_id  =  genez[x]
+                 nuc_change = str((int(position)) - (int(stop[x]) + 1))
+              elif strand[x] == 'reverse':
+                gene_id  =  genez[x]
+                nuc_change = str((int(start[x]) -1) - int(position))
+              gene_name = genez[x]
+              nucleotide_change = "c." + nuc_change + reference + ">" + alternate
+              amino_acid_change  = 'NA'
+              if len(fields[4]) > len(fields[3]):
+                 variant = "Insertion"
+              elif len(fields[3]) > len(fields[4]):
+                 variant = "Deletion"
+              else:
+                 variant = "SNP"
+              transcript         = 'NA'
+              transcript_pos     = 'NA'
+              orig_aacid         = 'NA'
+              new_aacid          = 'NA'
+              codon_pos          = 'NA'
+              annotation_details = ','.join(subannot[0:])
+              break
+
         if len(position1) != 0:
            if codon_pos == codon_pos1 and (int(position) - int(position1)) < 4 and float(perc_alt11) > 98.0 :
               Block = True   
