@@ -1,7 +1,6 @@
 #! /usr/bin/python
 
 import sys
-from string import join
 
 input1 = sys.argv[1]
 

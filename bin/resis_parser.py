@@ -9,6 +9,7 @@ input1 = sys.argv[1]
 input2 = sys.argv[2]
 (start,end,gene_name,ids,length,perc_cov,temp_start) = ([],[],[],[],[],[],[])
 idx = 0
+genomespan = 4411531
 sum_cov = 0.0
 fh1 = open(input1,'r')
 for lines in fh1:
@@ -37,9 +38,8 @@ for lines in fh2:
          try:
             avg_cov = float("{0:.2f}".format(sum_cov/float(length[idx])))
             #avg_cov = int(sum_cov/int(length[idx]))
-         except:
-             ZeroDivisionError
-         pass
+         except ZeroDivisionError:
+            pass
          avg_cov_str = str(avg_cov)
          covp = int(float(perc_cov[idx]) * 100)
          covp_str = str(covp)
@@ -49,7 +49,7 @@ for lines in fh2:
             idx += 1
             new_start = start[idx]
             new_end   = end[idx]
-    if int(fields[1]) > 4411531:
+    if int(fields[1]) > genomespan:
        sys.exit(1)
 
 fh2.close() 

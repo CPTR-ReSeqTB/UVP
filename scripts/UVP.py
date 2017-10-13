@@ -180,7 +180,6 @@ class snp():
     def runKraken(self):
         self.__ifVerbose("Running Kraken.")
         cwd = os.getcwd()
-        valiOut = self.fOut + "/validation"
         self.__logFH.write("########## Running Kraken. ##########\n")
         if self.paired:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
@@ -203,6 +202,7 @@ class snp():
             fields = lines.rstrip("\r\n").split("\t") 
             if fields[5].find("Mycobacterium tuberculosis") != -1:
                cov += float(fields[0])
+        fh1.close()
         if cov < 90:
            self.__CallCommand('mv', ['mv', self.input, self.flog])
            self.__CallCommand('mv', ['mv', self.fOut, self.flog])

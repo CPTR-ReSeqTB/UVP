@@ -3,8 +3,6 @@
 ## iterates through coverage files to find loci with no coverage
 
 import sys
-import re
-from string import join
 
 dele = False
 ids   = []

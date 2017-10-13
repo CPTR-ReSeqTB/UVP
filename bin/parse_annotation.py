@@ -5,7 +5,6 @@
 
 import sys
 import re
-from string import join
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]
@@ -51,7 +50,6 @@ transcript1         = ""
 annotation_details1 = ""
 Block               = False
 (genez,genezid,start,stop,gene_anot,strand) = ([],[],[],[],[],[])
-nuc_change  = ""
 dic = {'A':'T','T':'A','C':'G','G':'C'}
 ref_comp = ""
 alt_comp = ""

@@ -1,4 +1,3 @@
-CHROM	start	stop	Gene name	Gene ID
 NC_000962	1	1524	dnaA	Rv0001
 NC_000962	1525	2051	IntragenicSequence_Rv0001(dnaA)_Rv0002(dnaN)	IntragenicSequence_Rv0001(dnaA)_Rv0002(dnaN)
 NC_000962	2052	3260	dnaN	Rv0002

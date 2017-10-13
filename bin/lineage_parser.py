@@ -5,7 +5,6 @@
 """ it requires a sample ID name (string) and an output file name(string) """
 
 import sys
-from string import join
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]
