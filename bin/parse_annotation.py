@@ -50,8 +50,11 @@ gene_id1            = ""
 transcript1         = ""
 annotation_details1 = ""
 Block               = False
-(genez,start,stop,gene_anot,strand) = ([],[],[],[],[])
+(genez,genezid,start,stop,gene_anot,strand) = ([],[],[],[],[],[])
 nuc_change  = ""
+dic = {'A':'T','T':'A','C':'G','G':'C'}
+ref_comp = ""
+alt_comp = ""
 
 fh3 = open(input3,'r')
 for lines in fh3:
@@ -59,10 +62,11 @@ for lines in fh3:
     if lines.startswith("H37Rv"):
        continue
     genez.append(lined[0])
-    start.append(lined[1])
-    stop.append(lined[2])
-    gene_anot.append(lined[3])
-    strand.append(lined[4])
+    genezid.append(lined[1])
+    start.append(lined[2])
+    stop.append(lined[3])
+    gene_anot.append(lined[4])
+    strand.append(lined[5])
     
 fh1 = open(input1,'r')
 print "Sample ID" + "\t" + "CHROM" + "\t" + "POS" + "\t" + "REF" + "\t" + "ALT" + "\t" + "Read Depth" + "\t" + "Quality" + "\t" + "Percent Alt allele" + "\t" +  "Annotation" + "\t" + "Variant Type" + "\t" + "Nucleotide Change" + "\t" + "Position within CDS " + "\t" + "Amino acid change" + "\t" + "REF Amino acid" + "\t" + "ALT Amino Acid" + "\t" + "Codon Position" + "\t" "Gene name" + "\t" + "Gene ID" + "\t" + "Transcript ID" + "\t" + "Annotation details"  
@@ -106,18 +110,45 @@ for lines in fh1:
               elif genez[x] == 'crfA':
                  nuc_change = str((int(position)) - (int(start[x]) - 1))
                  gene_id = 'crfA'
+                 transcript_pos = nuc_change
               elif strand[x] == 'forward':
-                 gene_id  =  genez[x]
+                 gene_id = genezid[x]
                  nuc_change = str((int(position)) - (int(stop[x]) + 1))
               elif strand[x] == 'reverse':
-                   gene_id  =  genez[x]
-                   nuc_change = str((int(start[x]) -1) - int(position))
+                 ref_comp = ""
+                 alt_comp = ""
+                 for char in reference:
+                     ref_comp += dic[char]
+                 for char in alternate:
+                     alt_comp += dic[char]
+                 gene_id = genezid[x]
+                 nuc_change = str((int(start[x]) -1) - int(position))
               gene_name = genez[x]
               nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               amino_acid_change  = 'NA'
-              if len(fields[4]) > len(fields[3]): 
+              if len(fields[4]) > len(fields[3]):
+                 if strand[x] == 'forward':
+                    nucleotide_change = "c." + nuc_change + "_" + str(int(nuc_change) + 1) + "ins" + alternate[len(reference):]
+                    if genez[x] == 'crfA':
+                       transcript_pos = nuc_change + "-" + str(int(nuc_change) + 1)
+                 elif strand[x] == 'reverse':
+                    nucleotide_change = "c." + str(int(nuc_change) - 1) + "_" + nuc_change + "ins" + alt_comp[len(reference):][::-1]  
                  variant = "Insertion"
               elif len(fields[3]) > len(fields[4]):
+                 if strand[x] == 'forward':
+                    if len(reference) - len(alternate) == 1:
+                       nucleotide_change = "c." + str(int(nuc_change) + len(alternate)) + "del" + reference[len(alternate):]
+                       if genez[x] == 'crfA':
+                          transcript_pos = str(int(nuc_change) + len(alternate))
+                    else:
+                       nucleotide_change = "c." + str(int(nuc_change) + len(alternate)) + "_" + str(int(nuc_change) + len(reference) - 1) + "del" + reference[len(alternate):]
+                       if genez[x] == 'crfA':
+                          transcript_pos = str(int(nuc_change) + len(alternate)) + "-" + str(int(nuc_change) + len(reference) - 1)
+                 elif strand[x] == 'reverse':
+                    if len(reference) - len(alternate) == 1:
+                       nucleotide_change = "c." + str(int(nuc_change) - len(reference) - 1) + "del" + ref_comp[len(alternate):][::-1]
+                    else:
+                       nucleotide_change = "c." + str(int(nuc_change) - len(reference) - 1) + "_" + str(int(nuc_change) - len(alternate))  + "del" + ref_comp[len(alternate):][::-1]
                  variant = "Deletion"
               else:
                  variant = "SNP"
@@ -209,17 +240,37 @@ for lines in fh1:
            if (int(start[x]) -1) < int(position) < (int(stop[x]) + 1):
               annotation = gene_anot[x]    
               if strand[x] == 'forward':
-                 gene_id  =  genez[x]
+                 gene_id  =  genezid[x]
                  nuc_change = str((int(position)) - (int(stop[x]) + 1))
               elif strand[x] == 'reverse':
-                gene_id  =  genez[x]
-                nuc_change = str((int(start[x]) -1) - int(position))
+                 ref_comp = ""
+                 alt_comp = ""
+                 for char in reference:
+                     ref_comp += dic[char]
+                 for char in alternate:
+                     alt_comp += dic[char]
+                 gene_id  =  genezid[x]
+                 nuc_change = str((int(start[x]) -1) - int(position))
               gene_name = genez[x]
               nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               amino_acid_change  = 'NA'
               if len(fields[4]) > len(fields[3]):
+                 if strand[x] == 'forward':
+                    nucleotide_change = "c." + nuc_change + "_" + str(int(nuc_change) + 1) + "ins" + alternate[len(reference):]
+                 elif strand[x] == 'reverse':
+                    nucleotide_change = "c." + str(int(nuc_change) - 1) + "_" + nuc_change + "ins" + alt_comp[len(reference):][::-1]
                  variant = "Insertion"
               elif len(fields[3]) > len(fields[4]):
+                 if strand[x] == 'forward':
+                    if len(reference) - len(alternate) == 1:
+                       nucleotide_change = "c." + str(int(nuc_change) + len(alternate)) + "del" + reference[len(alternate):]
+                    else:
+                       nucleotide_change = "c." + str(int(nuc_change) + len(alternate)) + "_" + str(int(nuc_change) + len(reference) - 1) + "del" + reference[len(alternate):]
+                 elif strand[x] == 'reverse':
+                    if len(reference) - len(alternate) == 1:
+                       nucleotide_change = "c." + str(int(nuc_change) - len(reference) - 1) + "del" + ref_comp[len(alternate):][::-1]
+                    else:
+                       nucleotide_change = "c." + str(int(nuc_change) - len(reference) - 1) + "_" + str(int(nuc_change) - len(alternate))  + "del" + ref_comp[len(alternate):][::-1]
                  variant = "Deletion"
               else:
                  variant = "SNP"

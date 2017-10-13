@@ -1,73 +1,83 @@
-H37Rv gene	start	stop	type	coding strand
-gyrB upstream	4998	5239	intergenic	forward
-gyrA upstream	7268	7301	intergenic	forward
-ponA1 upstream	53245	53662	intergenic	forward
-ldtA upstream	141023	141199	intergenic	reverse
-ldtE upstream	223531	223563	intergenic	forward
-inbR upstream	331659	331747	intergenic	reverse
-fgd1 upstream	490706	490782	intergenic	forward
-lprQ upstream	571649	571709	intergenic	forward
-mshA upstream	575301	575347	intergenic	forward
-Rv0565c upstream	657471	657547	intergenic	reverse
-hadA upstream	731880	731929	intergenic	forward
-mmaA4 upstream	737204	737267	intergenic	reverse
-mmaA3 upstream	738150	738296	intergenic	reverse
-mmaA2 upstream	739161	739326	intergenic	reverse
-rpoB upstream	759310	759806	intergenic	forward
-rpoC upstream	763326	763369	intergenic	forward
-mmpR upstream	778906	778989	intergenic	forward
-rpsL upstream	781312	781559	intergenic	forward
-rplC upstream	800793	800808	intergenic	forward
-rpfB upstream	1127884	1128090	intergenic	forward
-mshB upstream	1300125	1300303	intergenic	forward
-fbiC upstream	1302682	1302930	intergenic	forward
-sigI upstream	1332011	1332091	intergenic	forward
-folP2 upstream	1351126	1351190	intergenic	forward
-tap upstream	1407341	1408238	CDS	reverse
-embR upstream	1417348	1417657	intergenic	reverse
-atpE upstream	1460997	1461044	intergenic	forward
-rrs upstream	1471743	1471845	intergenic	forward
-rrs	1471846	1473382	rRNA	forward
-rrl upstream	1473383	1473657	intergenic	forward
-rrl	1473658	1476795	rRNA	forward
-ldtD upstream	1611271	1611433	intergenic	forward
-fabG1 upstream	1673300	1673439	intergenic	forward
-inhA upstream	1674184	1674201	intergenic	forward
-pykA upstream	1816082	1816188	intergenic	forward
-rpsA upstream	1833380	1833541	intergenic	forward
-cycA upstream	1931457	1932654	intergenic	reverse
-eccB5 upstream	2017477	2017739	intergenic	forward
-ndh upstream	2103043	2103183	intergenic	reverse
-katG upstream	2156112	2156148	intergenic	reverse
-furA upstream	2156593	2156705	intergenic	reverse
-Rv1979c upstream	2223165	2223342	intergenic	reverse
-erm(37) upstream	2231455	2231679	intergenic	forward
-pncA upstream	2289242	2289281	intergenic	reverse
-blaC upstream	2326810	2326943	intergenic	reverse
-mshC upstream	2392460	2392516	intergenic	reverse
-eis upstream	2715333	2715471	intergenic	reverse
-ahpC upstream	2726088	2726192	intergenic	forward
-ldtB upstream	2835336	2835493	intergenic	reverse
-pepQ upstream	2860419	2860451	intergenic	reverse
-Rv2671 upstream	2985731	2986838	CDS	forward
-thyX upstream	3067946	3068188	intergenic	reverse
-dfrA upstream	3073610	3073679	intergenic	reverse
-thyA upstream	3074472	3074635	intergenic	reverse
-ald upstream	3086755	3086819	intergenic	forward
-gpsI upstream	3092598	3092950	intergenic	reverse
-dacB2 upstream	3218271	3218338	intergenic	forward
-ddlA upstream	3337918	3337994	intergenic	reverse
-serB2 upstream	3403163	3403199	intergenic	reverse
-mymA upstream	3448427	3448503	intergenic	forward
-whiB7 upstream	3568680	3569108	intergenic	reverse
-nudC upstream	3572544	3572601	intergenic	reverse
-fbiA upstream	3640142	3640542	intergenic	forward
-alr upstream	3841421	3841713	intergenic	reverse
-rpoA upstream	3878508	3878658	intergenic	reverse
-ddn upstream	3986733	3986843	intergenic	forward
-nat upstream	4008183	4008433	CDS	reverse
-folP1 upstream	4049981	4050585	CDS	reverse
-embA upstream	4243148	4243232	intergenic	forward
-ubiA upstream	4269834	4269839	intergenic	reverse
-ethA upstream	4327474	4327548	intergenic	reverse
-gidB upstream	4408203	4408333	intergenic	reverse
+H37Rv gene	H37Rv gene id	start	stop	type	coding strand
+gyrB upstream	Rv0005 upstream	4998	5239	intergenic	forward
+gyrA upstream	Rv0006 upstream	7268	7301	intergenic	forward
+ponA1 upstream	Rv0050 upstream	53245	53662	intergenic	forward
+ldtA upstream	Rv0116c upstream	141023	141199	intergenic	reverse
+ldtE upstream	Rv0192 upstream	223531	223563	intergenic	forward
+inbR upstream	Rv0275c upstream	331659	331747	intergenic	reverse
+fgd1 upstream	Rv0407 upstream	490706	490782	intergenic	forward
+lprQ upstream	Rv0483 upstream	571649	571709	intergenic	forward
+mshA upstream	Rv0486 upstream	575301	575347	intergenic	forward
+Rv0565c upstream	Rv0565c upstream	657471	657547	intergenic	reverse
+hadA upstream	Rv0635 upstream	731880	731929	intergenic	forward
+mmaA4 upstream	Rv0642c upstream	737204	737267	intergenic	reverse
+mmaA3 upstream	Rv0643c upstream	738150	738296	intergenic	reverse
+mmaA2 upstream	Rv0644c upstream	739161	739326	intergenic	reverse
+rpoB upstream	Rv0667 upstream	759310	759806	intergenic	forward
+rpoC upstream	Rv0668 upstream	763326	763369	intergenic	forward
+mmpR upstream	Rv0678 upstream	778906	778989	intergenic	forward
+rpsL upstream	Rv0682 upstream	781312	781559	intergenic	forward
+rplC upstream	Rv0701 upstream	800793	800808	intergenic	forward
+rpfB upstream	Rv1009 upstream	1127884	1128090	intergenic	forward
+mshB upstream	Rv1170 upstream	1300125	1300303	intergenic	forward
+fbiC upstream	Rv1173 upstream	1302682	1302930	intergenic	forward
+sigI upstream	Rv1189 upstream	1332011	1332091	intergenic	forward
+folP2 upstream	Rv1207 upstream	1351126	1351190	intergenic	forward
+tap upstream	Rv1258c upstream	1407341	1408238	CDS	reverse
+embR upstream	Rv1267c upstream	1417348	1417657	intergenic	reverse
+atpE upstream	Rv1305 upstream	1460997	1461044	intergenic	forward
+rrs upstream	MTB000019 upstream	1471743	1471845	intergenic	forward
+rrs	MTB000019 	1471846	1473382	rRNA	forward
+rrl upstream	MTB000020 upstream	1473383	1473657	intergenic	forward
+rrl	MTB000020  	1473658	1476795	rRNA	forward
+ldtD upstream	Rv1433 upstream	1611271	1611433	intergenic	forward
+fabG1 upstream	Rv1483 upstream	1673300	1673439	intergenic	forward
+inhA upstream	Rv1484 upstream	1674184	1674201	intergenic	forward
+pykA upstream	Rv1617 upstream	1816082	1816188	intergenic	forward
+rpsA upstream	Rv1630 upstream	1833380	1833541	intergenic	forward
+cycA upstream	Rv1704c upstream	1931457	1932654	intergenic	reverse
+eccB5 upstream	Rv1782 upstream	2017477	2017739	intergenic	forward
+ndh upstream	Rv1854c upstream	2103043	2103183	intergenic	reverse
+katG upstream	Rv1908c upstream	2156112	2156148	intergenic	reverse
+furA upstream	Rv1909c upstream	2156593	2156705	intergenic	reverse
+Rv1979c upstream	Rv1979c upstream	2223165	2223342	intergenic	reverse
+erm(37) upstream	erm(37) upstream	2231455	2231679	intergenic	forward
+pncA upstream	Rv2043 upstream	2289242	2289281	intergenic	reverse
+blaC upstream	Rv2068c upstream	2326810	2326943	intergenic	reverse
+mshC upstream	Rv2130c upstream	2392460	2392516	intergenic	reverse
+eis upstream	Rv2416c upstream	2715333	2715471	intergenic	reverse
+ahpC upstream	Rv2428 upstream	2726088	2726192	intergenic	forward
+ldtB upstream	Rv2518c upstream	2835336	2835493	intergenic	reverse
+pepQ upstream	Rv2535c upstream	2860419	2860451	intergenic	reverse
+Rv2671 upstream	Rv2671 upstream	2985731	2986838	CDS	forward
+thyX upstream	Rv2754c upstream	3067946	3068188	intergenic	reverse
+dfrA upstream	Rv2763c upstream	3073610	3073679	intergenic	reverse
+thyA upstream	Rv2764c upstream	3074472	3074635	intergenic	reverse
+ald upstream	Rv2780 upstream	3086755	3086819	intergenic	forward
+gpsI upstream	Rv2783c upstream	3092598	3092950	intergenic	reverse
+dacB2 upstream	Rv2911 upstream	3218271	3218338	intergenic	forward
+ddlA upstream	Rv2981c upstream	3337918	3337994	intergenic	reverse
+serB2 upstream	Rv3042c upstream	3403163	3403199	intergenic	reverse
+mymA upstream	Rv3083 upstream	3448427	3448503	intergenic	forward
+whiB7 upstream	Rv3197A upstream	3568680	3569108	intergenic	reverse
+nudC upstream	Rv3199c upstream	3572544	3572601	intergenic	reverse
+fbiA upstream	Rv3261 upstream	3640142	3640542	intergenic	forward
+alr upstream	Rv3423c upstream	3841421	3841713	intergenic	reverse
+rpoA upstream	Rv3457c upstream	3878508	3878658	intergenic	reverse
+ddn upstream	Rv3547 upstream	3986733	3986843	intergenic	forward
+nat upstream	Rv3566c upstream	4008183	4008433	CDS	reverse
+folP1 upstream	Rv3608c upstream	4049981	4050585	CDS	reverse
+embA upstream	Rv3794 upstream	4243148	4243232	intergenic	forward
+ubiA upstream	Rv3806c upstream	4269834	4269839	intergenic	reverse
+ethA upstream	Rv3854c upstream	4327474	4327548	intergenic	reverse
+gidB upstream	Rv3919c upstream	4408203	4408333	intergenic	reverse
+ppsA upstream	Rv2931 upstream	3243697	3245444	CDS	forward
+mas upstream	Rv2940c upstream	3282716	3283334	intergenic	reverse
+Rv0191 upstream	Rv0191 upstream	222162	222288	intergenic	forward
+Rv3008 upstream	Rv3008 upstram	3366451	3366643	intergenic	forward
+Rv1667c upstream	Rv1667c upstream	1894231	1895342	CDS	reverse
+proZ upstream	Rv3756c upstream	4202614	4203299	CDS	reverse
+clpC1 upstream	Rv3596c upstream	4040705	4040878	intergenic	reverse
+atpC upstream	Rv1311 upstream	1467302	1467314	intergenic	forward
+crfA upstream	crfA upstream	2718173	2718664	CDS	forward
+crfA	crfA	2718665	2719060	CDS	forward
