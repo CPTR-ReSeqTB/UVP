@@ -1,6 +1,11 @@
 #! /usr/bin/python
-
 import sys
+
+""" This reads the output file from samtools depth command """
+""" and iterates over all the base position to calculate """
+""" the average coverage depth and width  """
+
+
 
 input1 = sys.argv[1]
 
@@ -16,5 +21,6 @@ fh1.close()
 av_depth = depth/count
 perc_cov = float((count/4411532.00)*100.00)
 perc_cov_str = "{0:.2f}".format(perc_cov)
+print "Unified Analysis Pipeline Version: UVPv2.3.1\n"
 print "Average Genome Coverage Depth: " + str(av_depth)
 print "Percentage of Reference genome covered: " + perc_cov_str

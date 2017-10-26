@@ -1,16 +1,17 @@
 #! /usr/bin/python
 
+import sys
+
 """ Script accepts BEDTools coverage output file and samtools depth command output file   """
 """ and estimates the coverage across genomic regions that are in the input file """
 
-import sys
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]
 (start,end,gene_name,ids,length,perc_cov,temp_start) = ([],[],[],[],[],[],[])
 idx = 0
 genomespan = 4411531
-sum_cov = 0.0
+(sum_cov,avg_cov) = (0.0,0.0)
 fh1 = open(input1,'r')
 for lines in fh1:
     fields = lines.rstrip("\r\n").split("\t")
@@ -37,7 +38,6 @@ for lines in fh2:
          sum_cov -= float(fields[2])
          try:
             avg_cov = float("{0:.2f}".format(sum_cov/float(length[idx])))
-            #avg_cov = int(sum_cov/int(length[idx]))
          except ZeroDivisionError:
             pass
          avg_cov_str = str(avg_cov)

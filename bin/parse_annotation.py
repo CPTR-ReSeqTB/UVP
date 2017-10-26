@@ -1,10 +1,13 @@
 #! /usr/bin/python
 
+import sys
+import re
+from string import join
+
+
 """ The script accepts a SnpEff annotated VCF file and the sample ID name (string) as input options """
 """ it parses files and creates a final annotation file that is in a ReseqTB mappable format """
 
-import sys
-import re
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]
@@ -50,6 +53,7 @@ transcript1         = ""
 annotation_details1 = ""
 Block               = False
 (genez,genezid,start,stop,gene_anot,strand) = ([],[],[],[],[],[])
+nuc_change  = ""
 dic = {'A':'T','T':'A','C':'G','G':'C'}
 ref_comp = ""
 alt_comp = ""
@@ -191,6 +195,8 @@ for lines in fh1:
         gene_name          = smallannot[3]
         gene_id            = smallannot[4]
         transcript         = smallannot[6]
+        if gene_name == 'erm_37_':
+           gene_name = 'erm(37)'
         annotation_details = ','.join(subannot[1:])
         if 'ins' in nucleotide_change or 'ins' in amino_acid_change:
            variant = 'Insertion'

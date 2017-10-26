@@ -28,7 +28,6 @@ scripts:
     lineages: /uvp/bin/lineage_markers.txt
     excluded: /uvp/bin/excluded_loci.txt
     coverage_estimator: /uvp/bin/coverage_estimator.py
-    resloci: /uvp/bin/included_loci.txt
     bedlist: /uvp/bin/bed_list.txt     
     resis_parser: /uvp/bin/resis_parser.py
     del_parser: /uvp/bin/del_parse.py

@@ -95,7 +95,6 @@ class snp():
         self.__lineages           = cfg['scripts']['lineages']
         self.__excluded           = cfg['scripts']['excluded']
         self.__coverage_estimator = cfg['scripts']['coverage_estimator']
-        self.resloci              = cfg['scripts']['resloci']
         self.__bedlist            = cfg['scripts']['bedlist']     
         self.__resis_parser       = cfg['scripts']['resis_parser']
         self.__del_parser         = cfg['scripts']['del_parser']
@@ -159,7 +158,8 @@ class snp():
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:  " + self.input + "\t" + "not in fastq format\n")
                   sys.exit(1)
-""" Fastq QC """
+        fh2.close()
+    """ Fastq QC """
     def runFastQC(self):
         i = datetime.now()
         self.__ifVerbose("Performing  FastQC.")
@@ -342,9 +342,6 @@ class snp():
                                '-stand_call_conf', '20.0', '-stand_emit_conf', '20.0', '-nct', '6', '-nt', '4']) 
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_GATK.vcf'], 
                                [self.__vcfannotate, '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', GATKdir +'/gatk.vcf'])
-            self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_GATK_Resistance_filtered.vcf'], 
-                                  [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_GATK.vcf',
-                                  '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
             self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_GATK_filtered.vcf'], 
                                    [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_GATK.vcf',
                                    '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
@@ -382,9 +379,6 @@ class snp():
             self.__ifVerbose("   Filtering VCf file using vcftools.")
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_SamTools.vcf'], 
                                ['vcf-annotate', '--filter', 'SnpCluster=3,10/Qual=20/MinDP=10/MinMQ=20', samDir +'/SamTools.vcf'])
-            self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'], 
-                                  [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
-                                  '--stdout', '--bed', self.resloci, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
             self.__CallCommand(['vcftools remove-filtered-all', self.fOut + "/" + self.name +'_SamTools_filtered.vcf'], 
                                    [self.__vcftools, '--vcf', self.fOut + "/" + self.name +'_SamTools.vcf',
                                    '--stdout', '--exclude-bed', self.__excluded, '--remove-filtered-all', '--recode', '--recode-INFO-all'])
@@ -514,7 +508,7 @@ class snp():
            fh3 = open(self.fOut + "/" + self.name + '_deleted_loci.txt','r')
            for line in fh3:
              fields = line.rstrip("\r\n").split("\t")
-             notes.append(fields[9])
+             notes.append(fields[6])
            for keys in notes:
              if "Complete" in keys or "Partial" in keys:
                dele = False
@@ -529,7 +523,6 @@ class snp():
         i = datetime.now()
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
-        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_Resistance_annotation.txt'])
         self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
         self.__CallCommand('rm', ['rm',  self.__finalBam])
         self.__CallCommand('rm', ['rm',  self.kraken + "/kraken.txt"])
