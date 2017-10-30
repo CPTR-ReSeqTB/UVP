@@ -282,7 +282,6 @@ class snp():
                            'INPUT='+ GATKdir +'/GATK_s.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
                            'METRICS_FILE='+ GATKdir +'/MarkDupes.metrics', 'ASSUME_SORTED=true', 
                            'REMOVE_DUPLICATES=false', 'VALIDATION_STRINGENCY=LENIENT'])         
-        self.__ifVerbose("   Running AddOrReplaceReadGroups.")
         self.__ifVerbose("   Running BuildBamIndex.")
         self.__CallCommand('BuildBamIndex', ['java', '-Xmx8g', '-jar', self.__picard, 'BuildBamIndex',  
                            'INPUT='+ GATKdir +'/GATK_sdr.bam', 'VALIDATION_STRINGENCY=LENIENT'])
