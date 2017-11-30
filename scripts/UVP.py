@@ -163,8 +163,14 @@ class snp():
     def runFastQC(self):
         i = datetime.now()
         self.__ifVerbose("Performing  FastQC.")
-        self.__CallCommand('fastqc', [self.__fastqc, '--extract', '-t', self.__threads, '-o', self.fastqc, self.input])
+        if self.paired:
+           self.__CallCommand('fastqc', [self.__fastqc, '--extract', '-t', self.__threads, '-o', self.fastqc, self.input, self.input2])
+        else:
+           self.__CallCommand('fastqc', [self.__fastqc, '--extract', '-t', self.__threads, '-o', self.fastqc, self.input])
         fastqname = os.path.basename(self.input)
+        if self.paired:
+           fastqname2 = os.path.basename(self.input2)
+           fastqcinput2 = fastqname2.replace(".fastq.gz","_fastqc")
         fastqcinput = fastqname.replace(".fastq.gz","_fastqc")
         fastqcOut = self.fastqc + "/" + fastqcinput + "/summary.txt"
         fh1 = open(fastqcOut, 'r')
@@ -175,6 +181,8 @@ class snp():
                   break
         fh1.close()
         self.__CallCommand('rm', ['rm', '-r', self.fastqc + "/" + fastqcinput])
+        if self.paired:
+           self.__CallCommand('rm', ['rm', '-r', self.fastqc + "/" + fastqcinput2])
 
     """ Species specificity check """
     def runKraken(self):

@@ -106,16 +106,19 @@ for lines in fh1:
               if genez[x] == 'rrs':
                  nuc_change = str((int(position)) - (int(start[x]) - 1))
                  gene_id = 'MTB000019'
+                 nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               elif genez[x] == 'rrl':
                  nuc_change = str((int(position)) - (int(start[x]) - 1))
                  gene_id = 'MTB000020'
+                 nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               elif genez[x] == 'crfA':
                  nuc_change = str((int(position)) - (int(start[x]) - 1))
                  gene_id = 'crfA'
-                 transcript_pos = nuc_change
+                 nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               elif strand[x] == 'forward':
                  gene_id = genezid[x]
                  nuc_change = str((int(position)) - (int(stop[x]) + 1))
+                 nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               elif strand[x] == 'reverse':
                  ref_comp = ""
                  alt_comp = ""
@@ -125,8 +128,8 @@ for lines in fh1:
                      alt_comp += dic[char]
                  gene_id = genezid[x]
                  nuc_change = str((int(start[x]) -1) - int(position))
+                 nucleotide_change = "c." + nuc_change + ref_comp + ">" + alt_comp
               gene_name = genez[x]
-              nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               amino_acid_change  = 'NA'
               if len(fields[4]) > len(fields[3]):
                  if strand[x] == 'forward':
@@ -155,7 +158,10 @@ for lines in fh1:
               else:
                  variant = "SNP"
               transcript         = 'NA'
-              transcript_pos     = 'NA'
+              if genez[x] == 'crfA':
+                 transcript_pos  = nuc_change
+              else:
+                 transcript_pos  = 'NA'
               orig_aacid         = 'NA'
               new_aacid	         = 'NA'
               codon_pos	         = 'NA'
@@ -246,6 +252,7 @@ for lines in fh1:
               if strand[x] == 'forward':
                  gene_id  =  genezid[x]
                  nuc_change = str((int(position)) - (int(stop[x]) + 1))
+                 nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               elif strand[x] == 'reverse':
                  ref_comp = ""
                  alt_comp = ""
@@ -255,8 +262,8 @@ for lines in fh1:
                      alt_comp += dic[char]
                  gene_id  =  genezid[x]
                  nuc_change = str((int(start[x]) -1) - int(position))
+                 nucleotide_change = "c." + nuc_change + ref_comp + ">" + alt_comp
               gene_name = genez[x]
-              nucleotide_change = "c." + nuc_change + reference + ">" + alternate
               amino_acid_change  = 'NA'
               if len(fields[4]) > len(fields[3]):
                  if strand[x] == 'forward':
