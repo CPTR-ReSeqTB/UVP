@@ -457,8 +457,8 @@ class snp():
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
                   self.__mixed = "positive"
            fh1.close()
-        if os.path.isfile(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'):
-           fh2 = open(self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt','r')
+        if os.path.isfile(self.fOut + "/" + self.name +'_Final_annotation.txt'):
+           fh2 = open(self.fOut + "/" + self.name +'_Final_annotation.txt','r')
            for lines in fh2:
              lined = lines.rstrip("\r\n").split("\t")
              if lined[16] == "rrs":
