@@ -204,10 +204,10 @@ for lines in fh1:
         if gene_name == 'erm_37_':
            gene_name = 'erm(37)'
         annotation_details = ','.join(subannot[1:])
-        if 'ins' in nucleotide_change or 'ins' in amino_acid_change:
-           variant = 'Insertion'
-        elif 'del' in nucleotide_change or 'del' in amino_acid_change:
-            variant = 'Deletion'
+        if 'del' in nucleotide_change or 'del' in amino_acid_change:
+           variant = 'Deletion'
+        elif 'ins' in nucleotide_change or 'ins' in amino_acid_change:
+            variant = 'Insertion'
         elif 'dup' in nucleotide_change or 'dup' in amino_acid_change:
            variant = 'Insertion'
         else:
