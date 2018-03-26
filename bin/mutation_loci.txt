@@ -41,7 +41,7 @@ ndh upstream	Rv1854c upstream	2103043	2103183	intergenic	reverse
 katG upstream	Rv1908c upstream	2156112	2156148	intergenic	reverse
 furA upstream	Rv1909c upstream	2156593	2156705	intergenic	reverse
 Rv1979c upstream	Rv1979c upstream	2223165	2223342	intergenic	reverse
-erm(37) upstream	erm(37) upstream	2231455	2231679	intergenic	forward
+erm(37) upstream	Rv1988 upstream	2231455	2231679	intergenic	forward
 pncA upstream	Rv2043 upstream	2289242	2289281	intergenic	reverse
 blaC upstream	Rv2068c upstream	2326810	2326943	intergenic	reverse
 mshC upstream	Rv2130c upstream	2392460	2392516	intergenic	reverse
@@ -74,7 +74,7 @@ gidB upstream	Rv3919c upstream	4408203	4408333	intergenic	reverse
 ppsA upstream	Rv2931 upstream	3243697	3245444	CDS	forward
 mas upstream	Rv2940c upstream	3282716	3283334	intergenic	reverse
 Rv0191 upstream	Rv0191 upstream	222162	222288	intergenic	forward
-Rv3008 upstream	Rv3008 upstram	3366451	3366643	intergenic	forward
+Rv3008 upstream	Rv3008 upstream	3366451	3366643	intergenic	forward
 Rv1667c upstream	Rv1667c upstream	1894231	1895342	CDS	reverse
 proZ upstream	Rv3756c upstream	4202614	4203299	CDS	reverse
 clpC1 upstream	Rv3596c upstream	4040705	4040878	intergenic	reverse

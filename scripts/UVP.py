@@ -150,10 +150,7 @@ class snp():
             if lined.startswith("Returning"):
                comments = lined.split(":")
                if comments[2] != " FASTQ_SUCCESS":
-                  self.__CallCommand('mv', ['mv', self.input, self.flog])
-                  self.__CallCommand('mv', ['mv', self.fOut, self.flog])
-                  if self.paired:
-                     self.__CallCommand('mv', ['mv', self.input2, self.flog])  
+                  self.__CallCommand('mv', ['mv', self.fOut, self.flog])  
                   self.__logFH.write("Input not in fastq format\n")
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:  " + self.input + "\t" + "not in fastq format\n")
@@ -212,15 +209,11 @@ class snp():
                cov += float(fields[0])
         fh1.close()
         if cov < 90:
-           self.__CallCommand('mv', ['mv', self.input, self.flog])
            self.__CallCommand('mv', ['mv', self.fOut, self.flog])
            self.__CallCommand('rm', ['rm', self.kraken + "/kraken.txt"])
            self.__logFH.write("not species specific\n")
            i = datetime.now()
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "not species specific\n")
-           if self.paired:
-              self.__CallCommand('mv', ['mv', self.input2, self.flog])
-              self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input2 + "\t" + "not species specific\n")
            sys.exit(2) 
     
     """ Aligners """ 
@@ -448,7 +441,7 @@ class snp():
                lined = line.rstrip("\r\n")
                i = datetime.now()
                if "No Informative SNPs" in lined:
-                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")
+                  self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no MTBC lineage detected\n")
                   self.__unclear = "positive"
                elif "no precise lineage" in lined:
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "no clear lineage classification\n")

@@ -21,6 +21,6 @@ fh1.close()
 av_depth = depth/count
 perc_cov = float((count/4411532.00)*100.00)
 perc_cov_str = "{0:.2f}".format(perc_cov)
-print "Unified Analysis Pipeline Version: UVPv2.4.1\n"
+print "Unified Analysis Pipeline Version: UVPv2.5.1\n"
 print "Average Genome Coverage Depth: " + str(av_depth)
 print "Percentage of Reference genome covered: " + perc_cov_str
