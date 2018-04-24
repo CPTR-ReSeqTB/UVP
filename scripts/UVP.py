@@ -55,7 +55,7 @@ class snp():
         self.__CallCommand('mkdir', ['mkdir', '-p', self.kraken])
         self.__log     = self.fOut + "/" + self.name + ".log"
 
-        with open("/uvp/scripts/config.yml", 'r') as ymlfile:
+        with open(os.path.join(os.path.dirname(__file__), "config.yml"), 'r') as ymlfile:
              cfg       = yaml.load(ymlfile)
         self.__lineage = self.fOut + "/" + self.name + ".lineage_report.txt"
         self.__logFH   = open(self.__log, 'w')
