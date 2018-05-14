@@ -42,7 +42,7 @@ katG upstream	Rv1908c upstream	2156112	2156148	intergenic	reverse
 furA upstream	Rv1909c upstream	2156593	2156705	intergenic	reverse
 Rv1979c upstream	Rv1979c upstream	2223165	2223342	intergenic	reverse
 erm(37) upstream	Rv1988 upstream	2231455	2231679	intergenic	forward
-pncA upstream	Rv2043 upstream	2289242	2289281	intergenic	reverse
+pncA upstream	Rv2043c upstream	2289242	2289281	intergenic	reverse
 blaC upstream	Rv2068c upstream	2326810	2326943	intergenic	reverse
 mshC upstream	Rv2130c upstream	2392460	2392516	intergenic	reverse
 eis upstream	Rv2416c upstream	2715333	2715471	intergenic	reverse
