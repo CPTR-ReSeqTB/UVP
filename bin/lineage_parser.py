@@ -4,7 +4,11 @@ import sys
 """ This script accepts the final annotation file and the lineage marker SNPs file  """
 """ and infers the lineage and possible sublineage classification of the isolate  """
 """ it requires a sample ID name (string) and an output file name(string) """
+"""
+Author: Matthew Ezewudo
 
+CPTR ReSeqTB Project - Critical Path Institute
+"""
 
 
 input1 = sys.argv[1]

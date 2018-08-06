@@ -7,7 +7,11 @@ from string import join
 
 """ The script accepts a SnpEff annotated VCF file and the sample ID name (string) as input options """
 """ it parses files and creates a final annotation file that is in a ReseqTB mappable format """
+"""
+Author: Matthew Ezewudo
 
+CPTR ReSeqTB Project - Critical Path Institute
+"""
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]

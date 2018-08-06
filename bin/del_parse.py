@@ -1,7 +1,11 @@
 #! /usr/bin/python
 import sys
 ## iterates through coverage files to find loci with no coverage
+"""
+Author: Matthew Ezewudo
 
+CPTR ReSeqTB Project - Critical Path Institute
+"""
 
 
 dele = False

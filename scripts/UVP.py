@@ -1,6 +1,8 @@
 #! /usr/bin/python
 """
+Author: Matthew Ezewudo
 
+CPTR ReSeqTB Project - Critical Path Institute
 """
 import sys
 import subprocess

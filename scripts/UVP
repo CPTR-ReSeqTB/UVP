@@ -1,5 +1,11 @@
 #! /usr/bin/python
 
+"""
+Author: Matthew Ezewudo
+
+CPTR ReSeqTB Project - Critical Path Institute
+"""
+
 if __name__ == '__main__':
     import sys
     import os

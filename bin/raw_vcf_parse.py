@@ -2,6 +2,11 @@
 import sys
 
 ## compares raw vcf file to final annotation file to find low confidence variants
+"""
+Author: Matthew Ezewudo
+
+CPTR ReSeqTB Project - Critical Path Institute
+"""
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]

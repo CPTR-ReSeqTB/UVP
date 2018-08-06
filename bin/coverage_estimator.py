@@ -4,6 +4,11 @@ import sys
 """ This reads the output file from samtools depth command """
 """ and iterates over all the base position to calculate """
 """ the average coverage depth and width  """
+"""
+Author: Matthew Ezewudo
+
+CPTR ReSeqTB Project - Critical Path Institute
+"""
 
 
 

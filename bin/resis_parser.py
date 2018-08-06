@@ -5,6 +5,11 @@ import sys
 """ Script accepts BEDTools coverage output file and samtools depth command output file   """
 """ and estimates the coverage across genomic regions that are in the input file """
 
+"""
+Author: Matthew Ezewudo
+
+CPTR ReSeqTB Project - Critical Path Institute
+"""
 
 input1 = sys.argv[1]
 input2 = sys.argv[2]
