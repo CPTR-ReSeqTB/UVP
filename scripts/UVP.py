@@ -524,6 +524,7 @@ class snp():
         """ Clean up the temporary files, and move them to a proper folder. """
         i = datetime.now()
         self.__CallCommand('rm', ['rm', '-r', self.outdir])
+        self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name + '.mpileup'])
         self.__CallCommand('rm', ['rm',  self.fOut + "/" + self.name +'_annotation.txt'])
         self.__CallCommand('rm', ['rm',  self.fOut + '/'+ self.name + '_sdrcsm.bai'])
         self.__CallCommand('rm', ['rm',  self.__finalBam])
