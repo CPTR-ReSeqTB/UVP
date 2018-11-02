@@ -207,7 +207,7 @@ class snp():
         fh1 = open(krakenOut,'r')
         for lines in fh1:
             fields = lines.rstrip("\r\n").split("\t") 
-            if fields[5].find("Mycobacterium tuberculosis") != -1:
+            if fields[5].find("Mycobacterium tuberculosis complex") != -1:
                cov += float(fields[0])
         fh1.close()
         if cov < 90:
