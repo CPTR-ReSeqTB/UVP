@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 import sys
 
 ## compares raw vcf file to final annotation file to find low confidence variants
