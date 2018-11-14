@@ -34,4 +34,4 @@ scripts:
     mutationloci: /uvp/bin/mutation_loci.txt
     snplist: /uvp/bin/snps.vcf
 other:
-    threads: '12'
+    threads: '1'
