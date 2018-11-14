@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 import sys
 
 """ This reads the output file from samtools depth command """
