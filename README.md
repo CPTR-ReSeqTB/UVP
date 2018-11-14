@@ -2,7 +2,7 @@
 
 Set of scripts for analyzing NGS data
 
-##Software dependencies:
+## Software dependencies:
 
 BEDtools Version 2.17.0
 
