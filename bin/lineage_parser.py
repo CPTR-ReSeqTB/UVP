@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 import sys
 
 """ This script accepts the final annotation file and the lineage marker SNPs file  """
