@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#! /usr/bin/env python
 import sys
 ## iterates through coverage files to find loci with no coverage
 """
