@@ -211,8 +211,8 @@ class snp():
                cov += float(fields[0])
         fh1.close()
         if cov < 90:
-           self.__CallCommand('mv', ['mv', self.fOut, self.flog])
            self.__CallCommand('rm', ['rm', self.kraken + "/kraken.txt"])
+           self.__CallCommand('mv', ['mv', self.fOut, self.flog])
            self.__logFH.write("not species specific\n")
            i = datetime.now()
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "not species specific\n")
