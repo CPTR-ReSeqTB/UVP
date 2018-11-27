@@ -12,7 +12,7 @@ BWA Version 0.7.12
 
 FastQC Version 0.11.5
 
-Fastqvalidator Version 1.0.5
+fastqValidator Version 0.1.1a
 
 GATK Version 3.4.0
 
