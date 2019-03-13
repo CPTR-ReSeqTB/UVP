@@ -9,6 +9,7 @@ dependencies:
   - bwa=0.7.12
   - fastqc=0.11.5
   - fqtools=2.0
+  - openjdk=8
   - gatk=3.6
   - kraken=0.10.5
   - picard=1.141
