@@ -30,13 +30,16 @@ class snp():
         self.outdir             = self.fOut + "/tmp"
         self.tmp                = self.outdir + "/tmp"
         self.prinseq            = self.fOut + "/prinseq"
-        self.fastqc            = self.fOut + "/fastqc"
+        self.fastqc             = self.fOut + "/fastqc"
         self.qualimap           = self.fOut + "/qualimap"
         self.kraken             = self.fOut + "/kraken"
         self.paired             = paired
         self.input2             = input2
         self.verbose            = verbose
         self.reference          = reference
+        self.snplist            = os.path.join(os.path.dirname(__file__), 'data', 'snps.vcf')
+        self.bedlist            = os.path.join(os.path.dirname(__file__), 'data', 'bed_list.txt')
+        self.mutationloci       = os.path.join(os.path.dirname(__file__), 'data', 'mutation_loci.txt')
         self.__finalVCF         = ''
         self.__annotation       = ''
         self.__final_annotation = ''
@@ -243,7 +246,7 @@ class snp():
 
         """ Run mapping Report and Mark duplicates using Picard-Tools"""
         self.__ifVerbose("   Running SortSam.")
-        self.__CallCommand('SortSam', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx8g ' + '-Djava.io.tmpdir=' + self.tmp + '\"', 'picard', 'SortSam',  
+        self.__CallCommand('SortSam', ['env', 'JAVA_TOOL_OPTIONS=\"-Djava.io.tmpdir=' + self.tmp + ' -Xmx8g\"', 'picard', 'SortSam',  
                            'INPUT='+ GATKdir +'/GATK.bam', 'SORT_ORDER=coordinate', 'OUTPUT='+ GATKdir +'/GATK_s.bam', 
                            'VALIDATION_STRINGENCY=LENIENT', 'TMP_DIR=' + self.tmp])
         self.__ifVerbose("   Running Qualimap.")
@@ -275,7 +278,7 @@ class snp():
                            '-I', GATKdir +'/GATK_sdrc.bam', '-R', self.reference, '-BQSR', 
                            GATKdir +'/GATK_Resilist.grp', '-o', GATKdir +'/GATK_sdrcr.bam','-nct', '8'])
         self.__ifVerbose("   Running SortSam.")
-        self.__CallCommand('SortSam', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx8g ', '-Djava.io.tmpdir=' + self.tmp, + '\"' + 'picard', 'SortSam',  
+        self.__CallCommand('SortSam', ['env', 'JAVA_TOOL_OPTIONS=\"-Djava.io.tmpdir=' + self.tmp + ' -Xmx8g\"' + 'picard', 'SortSam',  
                            'INPUT='+ GATKdir +'/GATK_sdrcr.bam', 'SORT_ORDER=coordinate', 'TMP_DIR=' + self.tmp, 
                            'OUTPUT='+ GATKdir +'/GATK_sdrcs.bam', 'VALIDATION_STRINGENCY=LENIENT'])
         self.__ifVerbose("   Running BuildBamIndex.")
@@ -285,7 +288,7 @@ class snp():
         """ Filter out unmapped reads """
         self.__finalBam = self.fOut + '/'+ self.name + '_sdrcsm.bam'
         self.__ifVerbose("   Running samtools view.")
-        self.__CallCommand('samtools view', [self.__samtools, 'view', '-bhF', '4', '-o', self.__finalBam, 
+        self.__CallCommand('samtools view', ['samtools', 'view', '-bhF', '4', '-o', self.__finalBam, 
                            GATKdir +'/GATK_sdrcs.bam'])
         self.__ifVerbose("   Running BuildBamIndex.")
         self.__CallCommand('BuildBamIndex', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx8g\"', 'picard', 'BuildBamIndex', 'INPUT='+ self.__finalBam, 
@@ -318,7 +321,7 @@ class snp():
             self.__CallCommand(['samtools depth', samDir + '/coverage.txt'],
                                 [self.__samtools,'depth', self.__finalBam])
             self.__CallCommand(['bedtools coverage', samDir + '/bed_coverage.txt' ],
-                                ['bedtools', 'coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
+                                ['bedtools', 'coverage', '-abam', self.__finalBam, '-b', self.bedlist])
             self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
                                 ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])
             """ Set final VCF file. """
@@ -356,7 +359,7 @@ class snp():
             self.__CallCommand(['samtools depth', samDir + '/coverage.txt'],
                                 ['samtools', 'depth', self.__finalBam])
             self.__CallCommand(['bedtools coverage', samDir + '/bed_coverage.txt' ],
-                                ['bedtools', 'coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
+                                ['bedtools', 'coverage', '-abam', self.__finalBam, '-b', self.bedlist])
             self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
                                 ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])                 
 
@@ -400,7 +403,7 @@ class snp():
         self.__ifVerbose("Running Lineage Analysis")
         self.__final_annotation = self.fOut + "/" + self.name +'_Final_annotation.txt'
         self.__CallCommand(['lineage parsing', self.fOut + "/" + self.name +'_Lineage.txt'],
-                              ['python', self.__lineage_parser, self.__lineages, self.__final_annotation, self.__lineage, self.name])
+                              ['lineage_parser.py', self.__final_annotation, self.__lineage, self.name])
         count1 = 0
         count2 = 0
         count3 = 0
@@ -445,6 +448,7 @@ class snp():
     def runCoverage(self):
         """ Run Genome Coverage Statistics """
         cov = ""
+        wid = ""
         notes = []
         dele = True
 
@@ -452,28 +456,28 @@ class snp():
         samDir = self.outdir + "/SamTools"
         i = datetime.now()
         self.__CallCommand(['coverage estimator', self.fOut + "/" + self.name + '_Coverage.txt'],
-                            ['python', self.__coverage_estimator, samDir + '/coverage.txt'])
+                            ['coverage_estimator.py', samDir + '/coverage.txt'])
         self.__CallCommand(['genome region coverage estimator', self.fOut + "/" + self.name + '_genome_region_coverage.txt'],
-                            ['python', self.__resis_parser, samDir + '/bed_sorted_coverage.txt', samDir + '/coverage.txt'])
+                            ['resis_parser.py', samDir + '/bed_sorted_coverage.txt', samDir + '/coverage.txt'])
 
         if os.path.isfile(self.fOut + "/" + self.name + '_Coverage.txt'):
            fh2 = open(self.fOut + "/" + self.name + '_Coverage.txt','r')
            for line in fh2:
                if line.startswith("Average"):
-                  cov_str = line.split(":")
-                  cov = cov_str[1].strip(" ")
+                   cov_str = line.split(":")
+                   cov = cov_str[1].strip(" ")
                if line.startswith("Percentage"):
-                wid_str = line.split(":")
-                wid = wid_str[1].strip(" ")
+                   wid_str = line.split(":")
+                   wid = wid_str[1].strip(" ")
            if cov != '' and int(cov) < 10:
-              self.__low = "positive"
-              self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
+               self.__low = "positive"
+               self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage depth\n")
            if wid != '' and float(wid) < 94.99:
-            self.__low = "positive"
-            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage width\n")
+               self.__low = "positive"
+               self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage width\n")
            fh2.close()
            self.__CallCommand(['loci deletion parser', self.fOut + "/" + self.name + '_deleted_loci.txt'],
-                            ['python', self.__del_parser, self.fOut + "/" + self.name, self.name, self.__bedlist])
+                              ['del_parse.py', self.fOut + "/" + self.name, self.name, self.bedlist])
         if os.path.isfile(self.fOut + "/" + self.name + '_deleted_loci.txt'):
            fh3 = open(self.fOut + "/" + self.name + '_deleted_loci.txt','r')
            for line in fh3:
