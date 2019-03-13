@@ -11,6 +11,7 @@ setup(
     packages=['uvp'],
     scripts=[
         'bin/uvp',
+        'bin/UVP',
         'scripts/coverage_estimator.py',
         'scripts/del_parse.py',
         'scripts/lineage_parser.py',
