@@ -1,5 +1,5 @@
-#! /usr/bin/env python
-
+#!/usr/bin/env python
+from __future__ import print_function
 import sys
 
 """ Script accepts BEDTools coverage output file and samtools depth command output file   """
@@ -29,7 +29,7 @@ for lines in fh1:
 
 fh1.close()
 
-print "Chrom" + "\t" + "Start" + "\t" + "End" + "\t" + "Gene name" + "\t" + "Gene ID" + "\t" + "Average Depth" + "\t" + "Percent Region Coverage"
+print("Chrom" + "\t" + "Start" + "\t" + "End" + "\t" + "Gene name" + "\t" + "Gene ID" + "\t" + "Average Depth" + "\t" + "Percent Region Coverage")
 
 new_start = start[idx]
 new_end   = end[idx]
@@ -48,7 +48,7 @@ for lines in fh2:
          avg_cov_str = str(avg_cov)
          covp = int(float(perc_cov[idx]) * 100)
          covp_str = str(covp)
-         print "NC_000962" + "\t" + new_start + "\t" + new_end + "\t" + gene_name[idx] + "\t" + ids[idx] + "\t" + avg_cov_str + "\t" + covp_str
+         print("NC_000962" + "\t" + new_start + "\t" + new_end + "\t" + gene_name[idx] + "\t" + ids[idx] + "\t" + avg_cov_str + "\t" + covp_str)
          sum_cov = 0
          if idx < len(start) - 1:
             idx += 1

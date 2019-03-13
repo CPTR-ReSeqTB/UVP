@@ -4,13 +4,17 @@ Author: Matthew Ezewudo
 
 CPTR ReSeqTB Project - Critical Path Institute
 """
+from __future__ import print_function
 import sys
 import subprocess
 import os
 import types
 import gzip
 import yaml
-import ConfigParser
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser
 import io
 from datetime import datetime
 
@@ -66,9 +70,9 @@ class snp():
         self.__qlog    = self.flog + "/" + "low_quals.txt"
         self.__logFH2  = open(self.__mlog, 'a')
         self.__logged  = True
-				
-	# Format Validation
-	self.__fastqval           = cfg['tools']['fastqvalidator']
+
+        # Format Validation
+        self.__fastqval           = cfg['tools']['fastqvalidator']
         #fastq QC
         self.__fastqc            = cfg['tools']['fastqc']
         self.__kraken             = cfg['directories']['kraken']
@@ -89,15 +93,15 @@ class snp():
         self.__bedtools           = cfg['tools']['bedtools']
         self.__vcfannotate        = cfg['tools']['vcfannotate']
         self.__vcftools           = cfg['tools']['vcftools']
-        self.__vcfutils           = cfg['tools']['vcfutils'] 
-        self.__annotator          = cfg['tools']['annotator'] 
+        self.__vcfutils           = cfg['tools']['vcfutils']
+        self.__annotator          = cfg['tools']['annotator']
         self.__parser             = cfg['scripts']['parser']
         self.__lineage_parser     = cfg['scripts']['lineage_parser']
         self.__vcf_parser         = cfg['scripts']['vcf_parser']
         self.__lineages           = cfg['scripts']['lineages']
         self.__excluded           = cfg['scripts']['excluded']
         self.__coverage_estimator = cfg['scripts']['coverage_estimator']
-        self.__bedlist            = cfg['scripts']['bedlist']     
+        self.__bedlist            = cfg['scripts']['bedlist']
         self.__resis_parser       = cfg['scripts']['resis_parser']
         self.__del_parser         = cfg['scripts']['del_parser']
         self.mutationloci         = cfg['scripts']['mutationloci']
@@ -118,7 +122,7 @@ class snp():
             o.close()
             out = ""
             program = program[0]
-        
+
         if (self.__logged):
             self.__logFH.write('---[ '+ program +' ]---\n')
             self.__logFH.write('Command: \n' + ' '.join(command) + '\n\n')
@@ -127,32 +131,32 @@ class snp():
             if err:
                 self.__logFH.write('Standard Error: \n' + err + '\n\n')
         return 1
-    
+
     """ Input Validation """
     def runVali(self):
         self.__ifVerbose("Validating Input file.")
         valiOut = self.fOut + "/validation"
-        self.__CallCommand('mkdir', ['mkdir', '-p', valiOut]) 
+        self.__CallCommand('mkdir', ['mkdir', '-p', valiOut])
 
-        """ Validates format of input fastq files """	 			
-	if self.paired:
+        """ Validates format of input fastq files """
+        if self.paired:
            self.__CallCommand(['fastQValidator', valiOut + "/result1.out"], [self.__fastqval,'--file', self.input])
            self.__CallCommand(['fastQValidator', valiOut + "/result2.out"], [self.__fastqval,'--file', self.input2])
            output1 = valiOut + "/result1.out"
            output2 = valiOut + "/result2.out"
            self.__CallCommand(['cat', valiOut + "/result.out"], ['cat', output1, output2])
            self.__CallCommand('rm', ['rm', output1, output2 ])
-        else:  
-	   self.__CallCommand(['fastQValidator', valiOut + '/result.out'], [self.__fastqval,'--file', self.input])
+        else:
+            self.__CallCommand(['fastQValidator', valiOut + '/result.out'], [self.__fastqval,'--file', self.input])
         self.__CallCommand('mv', ['mv', valiOut + '/result.out', valiOut + '/Validation_report.txt'])	
-	output = valiOut + "/Validation_report.txt"
+        output = valiOut + "/Validation_report.txt"
         fh2 = open (output, 'r')
         for line in fh2:
             lined=line.rstrip("\r\n")
             if lined.startswith("Returning"):
                comments = lined.split(":")
                if comments[2] != " FASTQ_SUCCESS":
-                  self.__CallCommand('mv', ['mv', self.fOut, self.flog])  
+                  self.__CallCommand('mv', ['mv', self.fOut, self.flog])
                   self.__logFH.write("Input not in fastq format\n")
                   i = datetime.now()
                   self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:  " + self.input + "\t" + "not in fastq format\n")
@@ -216,9 +220,9 @@ class snp():
            self.__logFH.write("not species specific\n")
            i = datetime.now()
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.input + "\t" + "not species specific\n")
-           sys.exit(2) 
-    
-    """ Aligners """ 
+           sys.exit(2)
+
+    """ Aligners """
     def runBWA(self, bwa):
         """ Align reads against the reference using bwa."""
         self.__ranBWA = True
@@ -230,11 +234,11 @@ class snp():
         self.__bwaIndex(bwaOut + "/index")
         self.__alnSam = bwaOut + "/bwa.sam"
         self.__bwaLongReads(bwaOut)
-        self.__ifVerbose("") 
+        self.__ifVerbose("")
         self.__processAlignment()
-          
+
     def __bwaIndex(self, out):
-        """ Make an index of the given reference genome. """ 
+        """ Make an index of the given reference genome. """
         self.__CallCommand('mkdir', ['mkdir', '-p', out])
         self.__CallCommand('cp', ['cp', self.reference, out + "/ref.fa"])
         self.reference = out + "/ref.fa"
@@ -254,7 +258,7 @@ class snp():
             self.__ifVerbose("   Running BWA mem on single end reads.")
             self.__CallCommand(['bwa mem', self.__alnSam], [self.__bwa, 'mem','-t', self.__threads, '-R', 
                                "@RG\tID:" + self.name + "\tSM:" + self.name + "\tPL:ILLUMINA", 
-                                self.reference, self.input])       
+                                self.reference, self.input])
 
     def __processAlignment(self):
         """ Filter alignment using GATK and Picard-Tools """
@@ -324,7 +328,7 @@ class snp():
                            'VALIDATION_STRINGENCY=LENIENT'])
         self.__ifVerbose("")
         self.__CallCommand('rm', ['rm', '-r', self.tmp])
-    
+
     """ Callers """
     def runGATK(self):
         if os.path.isfile(self.__finalBam):
@@ -373,7 +377,7 @@ class snp():
             self.__CallCommand(['samtools mpileup', samDir + '/samtools.mpileup'], ['samtools', 'mpileup', '-Q', '20', '-q', '20', '-t', 'DP,DV,DPR', 
                                '-ugf', self.reference, self.__finalBam])
             self.__ifVerbose("   Running bcftools view.")
-            self.__CallCommand(['bcftools view', samDir + '/samtools.vcf'], 
+            self.__CallCommand(['bcftools view', samDir + '/samtools.vcf'],
                                [self.__bcftools, 'call', '-vcf', 'GQ', samDir + '/samtools.mpileup'])
             self.__ifVerbose("   Running vcfutils.pl varFilter.")
             self.__CallCommand(['vcfutils.pl varFilter', samDir +'/SamTools.vcf'], 
@@ -391,14 +395,14 @@ class snp():
                                 [self.__bedtools,'coverage', '-abam', self.__finalBam, '-b', self.__bedlist])
             self.__CallCommand(['sort', samDir + '/bed_sorted_coverage.txt' ],
                                 ['sort', '-nk', '2', samDir + '/bed_coverage.txt'])                 
-            
+
             """ Set final VCF """
-            if not self.__finalVCF: 
+            if not self.__finalVCF:
                 self.__finalVCF = self.fOut + "/" + self.name +'_SamTools_filtered.vcf'     
         else:
-            # print error  
-            pass  
-       
+            # print error
+            pass
+
     def annotateVCF(self):
         """ Annotate the final VCF file """
         cwd = os.getcwd()
@@ -503,7 +507,7 @@ class snp():
            if wid != '' and float(wid) < 94.99:
             self.__low = "positive"
             self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage width\n")
-           fh2.close()                  
+           fh2.close()
            self.__CallCommand(['loci deletion parser', self.fOut + "/" + self.name + '_deleted_loci.txt'],
                             ['python', self.__del_parser, self.fOut + "/" + self.name, self.name, self.__bedlist])
         if os.path.isfile(self.fOut + "/" + self.name + '_deleted_loci.txt'):
@@ -549,4 +553,4 @@ class snp():
            self.__CallCommand('mv', ['mv', self.fOut, self.flog])
     def __ifVerbose(self, msg):
         """ If verbose print a given message. """
-        if self.verbose: print msg
+        if self.verbose: print(msg)

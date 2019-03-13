@@ -1,4 +1,5 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
+from __future__ import print_function
 import sys
 
 """ This reads the output file from samtools depth command """
@@ -26,6 +27,6 @@ fh1.close()
 av_depth = depth/count
 perc_cov = float((count/4411532.00)*100.00)
 perc_cov_str = "{0:.2f}".format(perc_cov)
-print "Unified Analysis Pipeline Version: UVPv2.5.1\n"
-print "Average Genome Coverage Depth: " + str(av_depth)
-print "Percentage of Reference genome covered: " + perc_cov_str
+print("Unified Analysis Pipeline Version: UVPv2.5.1\n")
+print("Average Genome Coverage Depth: " + str(av_depth))
+print("Percentage of Reference genome covered: " + perc_cov_str)

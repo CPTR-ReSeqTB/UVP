@@ -1,4 +1,5 @@
-#! /usr/bin/env python
+#!/usr/bin/env python
+from __future__ import print_function
 import sys
 
 ## compares raw vcf file to final annotation file to find low confidence variants
@@ -35,7 +36,7 @@ for line in fh2:
      continue
   fields = line.rstrip("\r\n").split("\t")
   if fields[1] not in pos and fields[6] != 'PASS':
-     print >> fh3, id[0] + "\t" + fields[1] + "\t" + fields[3] + "\t" + fields[4] + "\t" + fields[6]
+     print(id[0] + "\t" + fields[1] + "\t" + fields[3] + "\t" + fields[4] + "\t" + fields[6], file=fh3)
 
 fh2.close()
 fh3.close()
