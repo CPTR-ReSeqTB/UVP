@@ -4,43 +4,41 @@ Set of scripts for analyzing NGS data
 
 ## Software dependencies:
 
-BEDtools Version 2.17.0
-
-Bcftools Version 1.2 
-
-BWA Version 0.7.12
-
-FastQC Version 0.11.5
-
-fastQValidator Version 0.1.1a
-
-GATK Version 3.4.0
-
-Kraken Version 0.10.5
-
-Picard Version 1.134
-
-Prinseq-lite.pl Version 0.204
-
-Pigz Version 2.3.3
-
-Qualimap Version 2.1.1
-
-Samtools Version 1.2
-
-SnpEff Version 4.1
-
-Vcftools Version 0.1.126
+| Name          | Version   |
+|---------------|-----------|
+| `bedtools`    | `2.17.0`  |
+| `bcftools`    | `1.2`     |
+| `bwa`         | `0.7.12`  |
+| `fastqc`      | `0.11.5`  |
+| `fqtools`     | `2.0`     |
+| `gatk`        | `3.6`     |
+| `kraken`      | `0.10.5`  |
+| `picard`      | `1.141`   |
+| `prinseq`     | `0.20.4`  |
+| `pigz`        | `2.3.4`   |
+| `qualimap`    | `2.1.3`   |
+| `samtools`    | `1.2`     |
+| `snpeff`      | `4.1`     |
+| `vcftools`    | `0.1.16`  |
 
 ## Installation
 
-The UVP requires at least 100GB RAM and up to 100GB storage space to run locally. Insatlling the UVP on your local machine is straight forward. Clone the entire repository, and download the specific version of each of the third party tool listed above into the 'Local Directory Path'/uvp/bin folder . You will need to edit the config.yml file in the 'Local Directory Path'/uvp/bin folder to point to the correct directory and file paths of all the scripts and tools listed there in.
+The UVP requires at least 100GB RAM and up to 100GB storage space to run locally. Insatlling the UVP on your local machine is straight forward. Clone the entire repository, then create a conda environment using the `environment.yml` file provided:
 
-You will run the UVP using command line prompts, by invoking the UVP module in the 'Local Directory Path'/uvp/scripts directory:
+```
+conda env create -f environment.yml
+```
 
-'Local Directory Path'/uvp/scripts/UVP -q 'input fastq' -r 'path to H37Rv reference genome fasta file' -n 'sample name' -q2 'paired fastq file' -a -v 
-  
+Then activate the environment:
 
+```
+conda activate reseqtb-uvp
+```
 
+You will need to edit the config.yml file to point to your kraken database.
 
+You will run the UVP using command line prompts as follows:
 
+```
+uvp -q 'input fastq' -r 'path to H37Rv reference genome fasta file' -n 'sample name' -q2 'paired fastq file' -a -v 
+```
