@@ -35,9 +35,33 @@ Then activate the environment:
 conda activate reseqtb-uvp
 ```
 
+Due to the terms of the GATK v3 license, it will be necessary to download and install the GATK `.jar` file separately. Download the GATK `.tar.bz2` file from this link:
+
+```
+https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.6-0-g89b7209
+```
+
+...then decompress it:
+
+```
+tar -xjvf GenomeAnalysisTK-3.6-0-g89b7209.tar.bz2 
+```
+
+...and (with the reseqtb-uvp conda environment active) register the `GenomeAnalysisTK.jar` file:
+
+```
+gatk-register GenomeAnalysisTK.jar
+```
+
+The `GenomeAnalysisTK.jar` file will be copied into the appropriate directory inside your `reseqtb-uvp` conda environment.
+
+## Configuration
+
 You will need to edit the config.yml file to point to your kraken database.
 
-You will run the UVP using command line prompts as follows:
+## Running the UVP
+
+Run the UVP using command line prompts as follows:
 
 ```
 uvp -q 'input fastq' -r 'path to H37Rv reference genome fasta file' -n 'sample name' -q2 'paired fastq file' -a -v 
