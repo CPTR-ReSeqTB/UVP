@@ -508,7 +508,7 @@ class Snp():
                self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "low genome coverage width\n")
            fh2.close()
            self.__CallCommand(['loci deletion parser', self.fOut + "/" + self.name + '_deleted_loci.txt'],
-                              [self.__del_parse, self.fOut + "/" + self.name, self.name, self.__bedlist])
+                              [self.__del_parser, self.fOut + "/" + self.name, self.name, self.__bedlist])
         if os.path.isfile(self.fOut + "/" + self.name + '_deleted_loci.txt'):
            fh3 = open(self.fOut + "/" + self.name + '_deleted_loci.txt','r')
            for line in fh3:
