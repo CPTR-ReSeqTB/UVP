@@ -9,9 +9,10 @@ from __future__ import print_function
 import sys
 import os
 import re
-import uvp
 import argparse as ap
 import gzip
+
+from uvp.snp import Snp
 
 def parse_args():
     
@@ -104,7 +105,7 @@ def main():
     (args, paired) = parse_args()
         
     # All is well let's get started!
-    s = uvp.snp(args.fastq, args.outdir, args.reference, args.name, paired, args.fastq2, 
+    s = Snp(args.fastq, args.outdir, args.reference, args.name, paired, args.fastq2, 
                         args.verbose, ' '.join(sys.argv))
 
     s.runVali()
