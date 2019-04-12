@@ -63,7 +63,7 @@ class Snp():
         self.__log     = self.fOut + "/" + self.name + ".log"
 
         with open(os.path.join(os.path.dirname(__file__), "config.yml"), 'r') as ymlfile:
-             cfg       = yaml.load(ymlfile)
+             cfg       = yaml.safe_load(ymlfile)
         self.__lineage = self.fOut + "/" + self.name + ".lineage_report.txt"
         self.__logFH   = open(self.__log, 'w')
         self.__logFH.write(argString + "\n\n")
