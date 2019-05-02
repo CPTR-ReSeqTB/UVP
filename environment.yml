@@ -4,6 +4,7 @@ channels:
   - bioconda
   - defaults
 dependencies:
+  - pyyaml=5.1
   - bedtools=2.17.0
   - bcftools=1.2
   - bwa=0.7.12
