@@ -106,7 +106,7 @@ class Snp():
         self.__resis_parser    = "resis_parser.py"
         self.__del_parser      = "del_parse.py"
         self.mutationloci      = os.path.join(os.path.dirname(__file__), 'data', 'mutation_loci.txt')
-        self.snplist           = os.path.join(os.path.dirname(__file__), 'data', 'snps.vcf')
+        self.snplist           = os.path.join(os.path.dirname(__file__), 'data', 'snps.NC_000962.vcf')
         self.__threads         = cfg['other']['threads']
         
     """ Shell Execution Functions """
@@ -268,7 +268,7 @@ class Snp():
         """ Convert SAM to BAM"""
         if (self.__ranBWA):
             self.__ifVerbose("   Running SamFormatConverter.")
-            self.__CallCommand('SamFormatConverter', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__picard, 'SamFormatConverter',  
+            self.__CallCommand('SamFormatConverter', ['env', '_JAVA_OPTIONS=-Xmx4g', self.__picard, 'SamFormatConverter',  
                                                       'INPUT='+ self.__alnSam, 'VALIDATION_STRINGENCY=LENIENT', 
                                                       'OUTPUT='+ GATKdir +'/GATK.bam'])
         else:
@@ -277,43 +277,43 @@ class Snp():
 
         """ Run mapping Report and Mark duplicates using Picard-Tools"""
         self.__ifVerbose("   Running SortSam.")
-        self.__CallCommand('SortSam', ['env', 'JAVA_TOOL_OPTIONS=\"-Djava.io.tmpdir=' + self.tmp + ' -Xmx8g\"', self.__picard, 'SortSam',  
+        self.__CallCommand('SortSam', ['env', '_JAVA_OPTIONS=-Xmx8g -Djava.io.tmpdir=' + self.tmp, self.__picard, 'SortSam',  
                            'INPUT='+ GATKdir +'/GATK.bam', 'SORT_ORDER=coordinate', 'OUTPUT='+ GATKdir +'/GATK_s.bam', 
                            'VALIDATION_STRINGENCY=LENIENT', 'TMP_DIR=' + self.tmp])
         self.__ifVerbose("   Running Qualimap.")
         self.__CallCommand('qualimap bamqc', [self.__qualimap, 'bamqc', '-bam', GATKdir +'/GATK_s.bam', '-outdir', self.qualimap])
         self.__ifVerbose("   Running MarkDuplicates.")
-        self.__CallCommand('MarkDuplicates', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx8g\"', self.__picard, 'MarkDuplicates',  
+        self.__CallCommand('MarkDuplicates', ['env', '_JAVA_OPTIONS=-Xmx8g', self.__picard, 'MarkDuplicates',  
                            'INPUT='+ GATKdir +'/GATK_s.bam', 'OUTPUT='+ GATKdir +'/GATK_sdr.bam',
                            'METRICS_FILE='+ GATKdir +'/MarkDupes.metrics', 'ASSUME_SORTED=true', 
                            'REMOVE_DUPLICATES=false', 'VALIDATION_STRINGENCY=LENIENT'])         
         self.__ifVerbose("   Running BuildBamIndex.")
-        self.__CallCommand('BuildBamIndex', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx8g\"', self.__picard, 'BuildBamIndex',  
+        self.__CallCommand('BuildBamIndex', ['env', '_JAVA_OPTIONS=-Xmx8g', self.__picard, 'BuildBamIndex',  
                            'INPUT='+ GATKdir +'/GATK_sdr.bam', 'VALIDATION_STRINGENCY=LENIENT'])
 
         """ Re-alignment around InDels using GATK """
         self.__ifVerbose("   Running RealignerTargetCreator.")
-        self.__CallCommand('RealignerTargetCreator', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx32g\"', self.__gatk, '-T', 
+        self.__CallCommand('RealignerTargetCreator', ['env', '_JAVA_OPTIONS=-Xmx32g', self.__gatk, '-T', 
                            'RealignerTargetCreator', '-I', GATKdir +'/GATK_sdr.bam', '-R', self.reference, 
                            '-o', GATKdir +'/GATK.intervals', '-nt', '12'])
         self.__ifVerbose("   Running IndelRealigner.")
-        self.__CallCommand('IndelRealigner', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__gatk, '-T', 'IndelRealigner', '-l', 
+        self.__CallCommand('IndelRealigner', ['env', '_JAVA_OPTIONS=-Xmx4g', self.__gatk, '-T', 'IndelRealigner', '-l', 
                            'INFO', '-I', GATKdir +'/GATK_sdr.bam', '-R', self.reference, '-targetIntervals', 
                            GATKdir +'/GATK.intervals', '-o', GATKdir +'/GATK_sdrc.bam'])
         self.__ifVerbose("   Running BaseRecalibrator.")
-        self.__CallCommand('BaseRecalibrator', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__gatk, '-T', 'BaseRecalibrator', 
+        self.__CallCommand('BaseRecalibrator', ['env', '_JAVA_OPTIONS=-Xmx4g', self.__gatk, '-T', 'BaseRecalibrator', 
                            '-I', GATKdir +'/GATK_sdrc.bam', '-R', self.reference, '--knownSites', 
                            self.snplist, '-o', GATKdir +'/GATK_Resilist.grp','-nct', '8'])
         self.__ifVerbose("   Running PrintReads.")
-        self.__CallCommand('PrintReads', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__gatk, '-T', 'PrintReads', 
+        self.__CallCommand('PrintReads', ['env', '_JAVA_OPTIONS=-Xmx4g', self.__gatk, '-T', 'PrintReads', 
                            '-I', GATKdir +'/GATK_sdrc.bam', '-R', self.reference, '-BQSR', 
                            GATKdir +'/GATK_Resilist.grp', '-o', GATKdir +'/GATK_sdrcr.bam','-nct', '8'])
         self.__ifVerbose("   Running SortSam.")
-        self.__CallCommand('SortSam', ['env', 'JAVA_TOOL_OPTIONS=\"-Djava.io.tmpdir=' + self.tmp + ' -Xmx8g\"' + self.__picard, 'SortSam',  
+        self.__CallCommand('SortSam', ['env', '_JAVA_OPTIONS=-Xmx12g -Djava.io.tmpdir=' + self.tmp, self.__picard, 'SortSam',  
                            'INPUT='+ GATKdir +'/GATK_sdrcr.bam', 'SORT_ORDER=coordinate', 'TMP_DIR=' + self.tmp, 
                            'OUTPUT='+ GATKdir +'/GATK_sdrcs.bam', 'VALIDATION_STRINGENCY=LENIENT'])
         self.__ifVerbose("   Running BuildBamIndex.")
-        self.__CallCommand('BuildBamIndex', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx8g\"', self.__picard, 'BuildBamIndex', 
+        self.__CallCommand('BuildBamIndex', ['env', '_JAVA_OPTIONS=-Xmx8g', self.__picard, 'BuildBamIndex', 
                            'INPUT='+ GATKdir +'/GATK_sdrcs.bam', 'VALIDATION_STRINGENCY=LENIENT'])
 
         """ Filter out unmapped reads """
@@ -322,7 +322,7 @@ class Snp():
         self.__CallCommand('samtools view', [self.__samtools, 'view', '-bhF', '4', '-o', self.__finalBam, 
                            GATKdir +'/GATK_sdrcs.bam'])
         self.__ifVerbose("   Running BuildBamIndex.")
-        self.__CallCommand('BuildBamIndex', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx8g\"', self.__picard, 'BuildBamIndex', 'INPUT='+ self.__finalBam, 
+        self.__CallCommand('BuildBamIndex', ['env', '_JAVA_OPTIONS=-Xmx8g', self.__picard, 'BuildBamIndex', 'INPUT='+ self.__finalBam, 
                            'VALIDATION_STRINGENCY=LENIENT'])
         self.__ifVerbose("")
         self.__CallCommand('rm', ['rm', '-r', self.tmp])
@@ -338,10 +338,10 @@ class Snp():
 
             """ Call SNPs/InDels with GATK """
             self.__ifVerbose("   Running UnifiedGenotyper.")
-            self.__CallCommand('Pileup', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__gatk, '-T', 'Pileup',
+            self.__CallCommand('Pileup', ['env', '_JAVA_OPTIONS=-Xmx4g', self.__gatk, '-T', 'Pileup',
                                '-I', self.__finalBam, '-R', self.reference,'-o', self.fOut + "/" + self.name +'.mpileup',
                                '-nct', '6', '-nt', '4'])
-            self.__CallCommand('UnifiedGenotyper', ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__gatk, '-T', 'UnifiedGenotyper', 
+            self.__CallCommand('UnifiedGenotyper', ['env', '_JAVA_OPTIONS=-Xmx4g', self.__gatk, '-T', 'UnifiedGenotyper', 
                                '-glm', 'BOTH', '-R', self.reference, '-I', self.__finalBam, '-o',  GATKdir +'/gatk.vcf', 
                                '-stand_call_conf', '20.0', '-stand_emit_conf', '20.0', '-nct', '6', '-nt', '4']) 
             self.__CallCommand(['vcf-annotate filter', self.fOut + "/" + self.name +'_GATK.vcf'], 
@@ -407,20 +407,20 @@ class Snp():
         if self.__finalVCF:
            self.__ifVerbose("Annotating final VCF.")
            self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_annotation.txt'],
-                                ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__annotator, 'NC_000962', self.__finalVCF])
+                                ['env', '_JAVA_OPTIONS=-Xmx4g', self.__annotator, '-download', 'm_tuberculosis_H37Rv', self.__finalVCF])
            self.__annotation = self.fOut + "/" + self.name +'_annotation.txt'
            self.__ifVerbose("parsing final Annotation.")
            self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Final_annotation.txt'],
                               [self.__parser, self.__annotation, self.name, self.mutationloci])
            if os.path.isfile(self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf'):
               self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_Resistance_annotation.txt'],
-                                 ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__annotator, 'NC_000962', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf']) 
+                                 ['env', '_JAVA_OPTIONS=-Xmx4g', self.__annotator, '-download', 'm_tuberculosis_H37Rv', self.fOut + "/" + self.name +'_SamTools_Resistance_filtered.vcf']) 
               self.__ifVerbose("parsing final Annotation.")
               self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'],
                               [self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt', self.name, self.mutationloci])
            elif os.path.isfile(self.fOut + "/" + self.name +'_GATK_Resistance_filtered.vcf'):
               self.__CallCommand(['SnpEff', self.fOut + "/" + self.name +'_Resistance_annotation.txt'],
-                                 ['env', 'JAVA_TOOL_OPTIONS=\"-Xmx4g\"', self.__annotator, 'NC_000962', self.fOut + "/" + self.name +'_GATK_Resistance_filtered.vcf']) 
+                                 ['env', '_JAVA_OPTIONS=-Xmx4g', self.__annotator, '-download', 'm_tuberculosis_H37Rv', self.fOut + "/" + self.name +'_GATK_Resistance_filtered.vcf']) 
               self.__ifVerbose("parsing final Annotation.")
               self.__CallCommand(['parse annotation', self.fOut + "/" + self.name +'_Resistance_Final_annotation.txt'],
                               [self.__parser, self.fOut + "/" + self.name +'_Resistance_annotation.txt', self.name, self.mutationloci])
@@ -434,7 +434,7 @@ class Snp():
         self.__ifVerbose("Running Lineage Analysis")
         self.__final_annotation = self.fOut + "/" + self.name +'_Final_annotation.txt'
         self.__CallCommand(['lineage parsing', self.fOut + "/" + self.name +'_Lineage.txt'],
-                              [self.__lineage_parser, self.__final_annotation, self.__lineage, self.name])
+                              [self.__lineage_parser, self.__lineages, self.__final_annotation, self.__lineage, self.name])
         count1 = 0
         count2 = 0
         count3 = 0
@@ -550,6 +550,7 @@ class Snp():
         if self.__exception == "positive":
            self.__logFH2.write(i.strftime('%Y/%m/%d %H:%M:%S') + "\t" + "Input:" + "\t" + self.name + "\t" + "Exception in analysis\n")
            self.__CallCommand('mv', ['mv', self.fOut, self.flog])
+
     def __ifVerbose(self, msg):
         """ If verbose print a given message. """
         if self.verbose: print(msg)
