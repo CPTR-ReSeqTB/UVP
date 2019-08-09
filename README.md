@@ -55,6 +55,14 @@ gatk-register GenomeAnalysisTK.jar
 
 The `GenomeAnalysisTK.jar` file will be copied into the appropriate directory inside your `reseqtb-uvp` conda environment.
 
+## Download the M. tuberculosis H37Rv snpEff database
+
+A M. tuberculosis snpEff database is necessary for annotating variants. Download it as follows:
+
+```
+snpEff eff -download m_tuberculosis_H37Rv
+```
+
 ## Configuration
 
 You will need to edit the config.yml file to point to your kraken database.
