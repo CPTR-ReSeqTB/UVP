@@ -4,22 +4,23 @@ Set of scripts for analyzing NGS data
 
 ## Software dependencies:
 
-| Name          | Version   |
-|---------------|-----------|
-| `bedtools`    | `2.17.0`  |
-| `bcftools`    | `1.2`     |
-| `bwa`         | `0.7.12`  |
-| `fastqc`      | `0.11.5`  |
-| `fqtools`     | `2.0`     |
-| `gatk`        | `3.6`     |
-| `kraken`      | `0.10.5`  |
-| `picard`      | `1.141`   |
-| `prinseq`     | `0.20.4`  |
-| `pigz`        | `2.3.4`   |
-| `qualimap`    | `2.1.3`   |
-| `samtools`    | `1.2`     |
-| `snpeff`      | `4.1`     |
-| `vcftools`    | `0.1.16`  |
+| Name                | Version   |
+|---------------------|-----------|
+| `bedtools`          | `2.17.0`  |
+| `bcftools`          | `1.2`     |
+| `bwa`               | `0.7.12`  |
+| `fastqc`            | `0.11.5`  |
+| `fqtools`           | `2.0`     |
+| `gatk`              | `3.6`     |
+| `kraken`            | `0.10.5`  |
+| `picard`            | `1.141`   |
+| `prinseq`           | `0.20.4`  |
+| `pigz`              | `2.3.4`   |
+| `qualimap`          | `2.1.3`   |
+| `samtools`          | `1.2`     |
+| `snpeff`            | `4.1`     |
+| `perl-vcftools-vcf` | `0.1.16`  | 
+| `vcftools`          | `0.1.16`  |
 
 ## Installation
 
