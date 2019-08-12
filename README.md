@@ -36,6 +36,14 @@ Then activate the environment:
 conda activate reseqtb-uvp
 ```
 
+With the `reseqtb-uvp` conda environment active, run the following command from withing the top-level directory of the 'UVP' repository to install the UVP code into the conda environment:
+
+```
+pip install -e .
+```
+
+Note: the `-e` flag installs UVP in 'editable' mode so that any changes to the code-base will be automatically installed into the conda environment.
+
 Due to the terms of the GATK v3 license, it will be necessary to download and install the GATK `.jar` file separately. Download the GATK `.tar.bz2` file from this link:
 
 ```
@@ -58,7 +66,7 @@ The `GenomeAnalysisTK.jar` file will be copied into the appropriate directory in
 
 ## Download the M. tuberculosis H37Rv snpEff database
 
-A M. tuberculosis snpEff database is necessary for annotating variants. Download it as follows:
+A M. tuberculosis snpEff database is necessary for annotating variants. With the `reseqtb-uvp` conda environment active, run the following command to download it:
 
 ```
 snpEff eff -download m_tuberculosis_H37Rv
