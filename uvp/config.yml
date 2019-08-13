@@ -1,0 +1,4 @@
+directories:
+    krakendb: /KRAKEN/customdb
+other:
+    threads: '1'
