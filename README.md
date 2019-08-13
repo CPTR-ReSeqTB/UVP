@@ -69,7 +69,7 @@ The `GenomeAnalysisTK.jar` file will be copied into the appropriate directory in
 A M. tuberculosis snpEff database is necessary for annotating variants. With the `reseqtb-uvp` conda environment active, run the following command to download it:
 
 ```
-snpEff eff -download m_tuberculosis_H37Rv
+snpEff download m_tuberculosis_H37Rv
 ```
 
 ## Configuration
