@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='reseqtb-uvp',
-    version='2.5.1',
+    version='2.6.0',
     description='Mycobacterium tuberculosis next generation sequence analysis',
     url='http://github.com/CPTR-ReSeqTB/UVP',
     author='Matthew Ezewudo',
