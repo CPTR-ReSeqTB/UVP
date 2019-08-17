@@ -9,6 +9,7 @@ setup(
     author_email='',
     license='MIT',
     packages=['uvp'],
+    include_package_data=True,
     scripts=[
         'bin/uvp',
         'bin/UVP',
