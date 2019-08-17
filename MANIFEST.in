@@ -1,4 +1,3 @@
-include uvp/config.yml
 include uvp/data/bed_list.txt
 include uvp/data/excluded_loci.txt
 include uvp/data/lineage_markers.txt

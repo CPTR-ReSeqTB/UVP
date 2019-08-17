@@ -6,6 +6,12 @@ Author: Matthew Ezewudo
 CPTR ReSeqTB Project - Critical Path Institute
 """
 from __future__ import print_function
+
+try:
+    from configparser import ConfigParser
+except ImportError:
+    from ConfigParser import ConfigParser
+
 import sys
 import os
 import re
@@ -35,6 +41,9 @@ def parse_args():
     group5 = parser.add_argument_group('Annotation', 'Use snpEff to annotate VCF file')
     group5.add_argument('-a', action='store_true', help='Run snpEff functional annotation.')
     group6 = parser.add_argument_group('Optional', '')
+    group6.add_argument('-t', '--threads', help='Num CPU threads for parallel execution', default=1)
+    group6.add_argument('-k', '--kraken-db', help='Path to kraken database', metavar="STRING")
+    group6.add_argument('-c', '--config', help='Config file', metavar="STRING")
     group6.add_argument('-v', '--verbose', action='store_true', help='Produce status updates of the run.') 
     group6.add_argument('-h', '--help', action='help', help='Show this help message and exit')
     group6.add_argument('--version', action='version', version='%(prog)s v2.6.0', 
@@ -105,8 +114,20 @@ def main():
     (args, paired) = parse_args()
         
     # All is well let's get started!
-    s = Snp(args.fastq, args.outdir, args.reference, args.name, paired, args.fastq2, 
-                        args.verbose, ' '.join(sys.argv))
+    s = Snp(
+        {
+            'fastq' = args.fastq,
+            'outdir' = args.outdir,
+            'reference' = args.reference,
+            'name' = args.name,
+            'paired' = paired,
+            'fastq2' = args.fastq2, 
+            'verbose' = args.verbose,
+            'krakendb' = krakendb,
+            'threads' = threads,
+            'argString' = ' '.join(sys.argv)
+        }
+    )
 
     s.runVali()
     s.runKraken()
