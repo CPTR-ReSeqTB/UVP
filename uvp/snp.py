@@ -18,22 +18,22 @@ from datetime import datetime
 
 class Snp():
 
-    def __init__(self, **kwargs):
-    """
-    Initializer for 'Snp'.
-    Required keyword arguments:
-      'input': Path to R1 fastq file
-      'input2': Path to R2 fastq file
-      'reference': Path to reference fasta file
-      'name': Sample name
-      'outdir': Path to output directory
-      'paired': Reads are from paired-end library (boolean)
-      'verbose': Verbose output (boolean)
-      'krakendb': Path to kraken database
-      'threads': Number of CPU threads for parallel execution
-      'argString': Argument string (for logging)
-    """
-        self.name               = kwargs['name']
+    def __init__(self, input, outdir, reference, name, paired, input2, verbose, krakendb, threads, argString):
+        """
+        Initializer for 'Snp'.
+        Required keyword arguments:
+          'input': Path to R1 fastq file
+          'input2': Path to R2 fastq file
+          'reference': Path to reference fasta file
+          'name': Sample name
+          'outdir': Path to output directory
+          'paired': Reads are from paired-end library (boolean)
+          'verbose': Verbose output (boolean)
+          'krakendb': Path to kraken database
+          'threads': Number of CPU threads for parallel execution
+          'argString': Argument string (for logging)
+        """
+        self.name               = name
         self.fOut1              = "Results"
         self.fOut               = self.fOut1 + "/" + outdir
         self.flog               = "QC"
@@ -44,10 +44,10 @@ class Snp():
         self.fastqc             = self.fOut + "/fastqc"
         self.qualimap           = self.fOut + "/qualimap"
         self.kraken             = self.fOut + "/kraken"
-        self.paired             = kwargs['paired']
-        self.input2             = kwargs['input2']
-        self.verbose            = kwargs['verbose']
-        self.reference          = kwargs['reference']
+        self.paired             = paired
+        self.input2             = input2
+        self.verbose            = verbose
+        self.reference          = reference
         self.__finalVCF         = ''
         self.__annotation       = ''
         self.__final_annotation = ''
@@ -85,7 +85,7 @@ class Snp():
         #fastq QC
         self.__fastqc          = "fastqc"
         self.__kraken          = "kraken"
-        self.__krakendb        = kwargs['krakendb']
+        self.__krakendb        = krakendb
         self.__krakenreport    = "kraken-report"
         self.__pigz            = "pigz"
         self.__unpigz          = "unpigz"
@@ -115,7 +115,7 @@ class Snp():
         self.__del_parser      = "del_parse.py"
         self.mutationloci      = os.path.join(os.path.dirname(__file__), 'data', 'mutation_loci.txt')
         self.snplist           = os.path.join(os.path.dirname(__file__), 'data', 'snps.NC_000962.vcf')
-        self.__threads         = kwargs['threads']
+        self.__threads         = threads
         
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
@@ -201,7 +201,7 @@ class Snp():
         if self.paired:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
                                self.__krakendb, '--gzip-compressed', self.input, self.input2,
-                               '--paired', '--fastq-input', '--threads', self.__threads, '--classified-out',
+                               '--paired', '--fastq-input', '--threads', str(self.__threads), '--classified-out',
                                 self.name + "_classified_Reads.fastq"])
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
                                self.__krakendb, self.kraken + "/kraken.txt"])
