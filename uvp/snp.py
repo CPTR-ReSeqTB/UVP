@@ -18,10 +18,10 @@ from datetime import datetime
 
 class Snp():
 
-    def __init__(self, input, outdir, reference, name, paired, input2, verbose, krakendb, threads, argString):
+    def __init__(self, input, outdir, reference, name, paired, input2, verbose, argString, krakendb, threads):
         """
         Initializer for 'Snp'.
-        Required keyword arguments:
+        Required arguments:
           'input': Path to R1 fastq file
           'input2': Path to R2 fastq file
           'reference': Path to reference fasta file
@@ -29,9 +29,9 @@ class Snp():
           'outdir': Path to output directory
           'paired': Reads are from paired-end library (boolean)
           'verbose': Verbose output (boolean)
+          'argString': Argument string (for logging)
           'krakendb': Path to kraken database
           'threads': Number of CPU threads for parallel execution
-          'argString': Argument string (for logging)
         """
         self.name               = name
         self.fOut1              = "Results"
