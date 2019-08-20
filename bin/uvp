@@ -104,10 +104,21 @@ def parse_args():
         print(' '.join(sys.argv))
         print("")
 
+    # A config file supplied on the command-line will
+    # be used with higher priority than the installed config file
     if args.config:
-        with open(args.config, 'r') as configfile:
-            config = yaml.safe_load(configfile)
+        config = args.config
+    else:
+        config = os.path.join(
+            os.path.dirname(uvp.__file__),
+            'config.yml'
+        )
+        
+    with open(config, 'r') as configfile:
+        config = yaml.safe_load(configfile)
 
+        
+    
     # Command-line arguments have higher
     # priority than config file settings.
     if not args.krakendb:
