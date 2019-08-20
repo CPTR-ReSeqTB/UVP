@@ -35,7 +35,7 @@ def parse_args():
     group4.add_argument('--gatk', action='store_true', help='Run GATK SNP / InDel calling. (Default)')
     group4.add_argument('--samtools', action='store_true', help='Run SamTools SNP / InDel calling.')
     group5 = parser.add_argument_group('Annotation', 'Use snpEff to annotate VCF file')
-    group5.add_argument('-a', action='store_true', help='Run snpEff functional annotation.')
+    group5.add_argument('-a', '--annotate', action='store_true', help='Run snpEff functional annotation.')
     group6 = parser.add_argument_group('Optional', '')
     group6.add_argument('-t', '--threads', help='Num CPU threads for parallel execution', default=1)
     group6.add_argument('-k', '--krakendb', help='Path to kraken database', metavar="STRING")
