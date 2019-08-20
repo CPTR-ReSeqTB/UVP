@@ -14,6 +14,7 @@ import argparse
 import gzip
 import yaml
 
+import uvp
 from uvp.snp import Snp
 
 def parse_args():
