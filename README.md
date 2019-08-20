@@ -73,13 +73,44 @@ snpEff download m_tuberculosis_H37Rv
 ```
 
 ## Configuration
+The following configuration settings may be supplied in a configuration file instead of providing them as command-line arguments:
 
-You will need to edit the config.yml file to point to your kraken database.
+- Path to kraken database
+- Number of CPU threads for parallel execution
+
+The config file should be a valid `yaml` file with this structure:
+
+```yml
+directories:
+    krakendb: /data/ref_databases/kraken/minikraken
+other:
+    threads: 8
+```
+
+When UVP is installed, a `config.yml` file is stored in `lib/python<version>/site-packages/uvp/config.yml`. The user may edit that file to provide the appropriate configuration settings. Alternatively, a `config.yml` can be provided using the `-c` or `--config` flags when an analysis in initiated. A config file supplied using the `-c` or `--config` flag will override any settings stored in the installed config file.
+
+The `krakendb` and `threads` parameters can also be supplied directly using the `-k`/`--krakendb` and `-t`/`--threads` flags, respectively. If those flags are included when starting an analysis they will override any values in config files.
+
 
 ## Running the UVP
 
 Run the UVP using command line prompts as follows:
 
 ```
-uvp -q 'input fastq' -r 'path to H37Rv reference genome fasta file' -n 'sample name' -q2 'paired fastq file' -a -v 
+uvp \
+  -n 'sample name' \
+  -r 'path to H37Rv reference genome fasta file' \
+  -q 'input fastq' \
+  -q2 'paired fastq file' \
+  -a -v 
+```
+
+```
+uvp \
+  -c 'path to config file' \
+  -n 'sample name' \
+  -r 'path to H37Rv reference genome fasta file' \
+  -q 'input fastq' \
+  -q2 'paired fastq file' \
+  -a -v 
 ```
