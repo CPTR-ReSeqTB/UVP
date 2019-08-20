@@ -102,8 +102,11 @@ uvp \
   -r 'path to H37Rv reference genome fasta file' \
   -q 'input fastq' \
   -q2 'paired fastq file' \
-  -a -v 
+  --annotate \
+  --verbose 
 ```
+
+When passing a config file, use the `-c` or `--config` flag:
 
 ```
 uvp \
@@ -112,5 +115,21 @@ uvp \
   -r 'path to H37Rv reference genome fasta file' \
   -q 'input fastq' \
   -q2 'paired fastq file' \
-  -a -v 
+  --annotate \
+  --verbose 
 ```
+
+...or set the krakendb and threads parameters directly on the command-line:
+
+```
+uvp \
+  -n 'sample name' \
+  -r 'path to H37Rv reference genome fasta file' \
+  -q 'input fastq' \
+  -q2 'paired fastq file' \
+  --krakendb 'path to kraken database' \
+  --threads 16 \
+  --annotate \
+  --verbose 
+```
+
