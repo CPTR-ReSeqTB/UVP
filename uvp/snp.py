@@ -115,7 +115,7 @@ class Snp():
         self.__del_parser      = "del_parse.py"
         self.mutationloci      = os.path.join(os.path.dirname(__file__), 'data', 'mutation_loci.txt')
         self.snplist           = os.path.join(os.path.dirname(__file__), 'data', 'snps.NC_000962.vcf')
-        self.__threads         = threads
+        self.__threads         = str(threads)
         
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
@@ -201,7 +201,7 @@ class Snp():
         if self.paired:
            self.__CallCommand(['kraken', self.kraken + "/kraken.txt"],[self.__kraken, '--db', 
                                self.__krakendb, '--gzip-compressed', self.input, self.input2,
-                               '--paired', '--fastq-input', '--threads', str(self.__threads), '--classified-out',
+                               '--paired', '--fastq-input', '--threads', self.__threads, '--classified-out',
                                 self.name + "_classified_Reads.fastq"])
            self.__CallCommand(['krakenreport', self.kraken + "/final_report.txt"],[self.__krakenreport, '--db',
                                self.__krakendb, self.kraken + "/kraken.txt"])
