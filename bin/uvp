@@ -42,7 +42,7 @@ def parse_args():
     group6.add_argument('-c', '--config', help='Config file', metavar="STRING")
     group6.add_argument('-v', '--verbose', action='store_true', help='Produce status updates of the run.') 
     group6.add_argument('-h', '--help', action='help', help='Show this help message and exit')
-    group6.add_argument('--version', action='version', version='%(prog)s v2.6.0', 
+    group6.add_argument('--version', action='version', version='%(prog)s v2.7.0',
                         help='Show program\'s version number and exit')
    
     if len(sys.argv)==1:
