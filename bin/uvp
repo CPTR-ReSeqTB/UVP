@@ -17,6 +17,12 @@ import yaml
 import uvp
 from uvp.snp import Snp
 
+
+class TagNonDefault(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values)
+        setattr(namespace, self.dest+'_nondefault', True)
+
 def parse_args():
     
     parser = argparse.ArgumentParser(prog='uvp', conflict_handler='resolve',
@@ -38,7 +44,7 @@ def parse_args():
     group5 = parser.add_argument_group('Annotation', 'Use snpEff to annotate VCF file')
     group5.add_argument('-a', '--annotate', action='store_true', help='Run snpEff functional annotation.')
     group6 = parser.add_argument_group('Optional', '')
-    group6.add_argument('-t', '--threads', help='Num CPU threads for parallel execution', default=1)
+    group6.add_argument('-t', '--threads', help='Num CPU threads for parallel execution', default=1, action=TagNonDefault)
     group6.add_argument('-k', '--krakendb', help='Path to kraken database', metavar="STRING")
     group6.add_argument('-c', '--config', help='Config file', metavar="STRING")
     group6.add_argument('-v', '--verbose', action='store_true', help='Produce status updates of the run.') 
@@ -125,14 +131,14 @@ def parse_args():
     if not args.krakendb:
         args.krakendb = config['directories']['krakendb']
 
-    if not args.threads:
+    if not hasattr(args, 'threads_nondefault') :
         args.threads = config['other']['threads']
 
     return (args, paired)
 
 def main():
     (args, paired) = parse_args()
-        
+
     # All is well let's get started!
     s = Snp(
             input = args.fastq,
