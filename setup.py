@@ -2,13 +2,14 @@ from setuptools import setup
 
 setup(
     name='reseqtb-uvp',
-    version='2.6.0',
+    version='2.7.0',
     description='Mycobacterium tuberculosis next generation sequence analysis',
     url='http://github.com/CPTR-ReSeqTB/UVP',
     author='Matthew Ezewudo',
     author_email='',
     license='MIT',
     packages=['uvp'],
+    include_package_data=True,
     scripts=[
         'bin/uvp',
         'bin/UVP',

@@ -12,16 +12,27 @@ import re
 import types
 import gzip
 import yaml
-try:
-    from configparser import ConfigParser
-except ImportError:
-    from ConfigParser import ConfigParser
+
 import io
 from datetime import datetime
 
 class Snp():
 
-    def __init__(self, input, outdir, reference, name, paired,input2, verbose, argString):
+    def __init__(self, input, outdir, reference, name, paired, input2, verbose, argString, krakendb, threads):
+        """
+        Initializer for 'Snp'.
+        Required arguments:
+          'input': Path to R1 fastq file
+          'input2': Path to R2 fastq file
+          'reference': Path to reference fasta file
+          'name': Sample name
+          'outdir': Path to output directory
+          'paired': Reads are from paired-end library (boolean)
+          'verbose': Verbose output (boolean)
+          'argString': Argument string (for logging)
+          'krakendb': Path to kraken database
+          'threads': Number of CPU threads for parallel execution
+        """
         self.name               = name
         self.fOut1              = "Results"
         self.fOut               = self.fOut1 + "/" + outdir
@@ -61,9 +72,6 @@ class Snp():
         self.__CallCommand('mkdir', ['mkdir', '-p', self.qualimap])
         self.__CallCommand('mkdir', ['mkdir', '-p', self.kraken])
         self.__log     = self.fOut + "/" + self.name + ".log"
-
-        with open(os.path.join(os.path.dirname(__file__), "config.yml"), 'r') as ymlfile:
-             cfg       = yaml.safe_load(ymlfile)
         self.__lineage = self.fOut + "/" + self.name + ".lineage_report.txt"
         self.__logFH   = open(self.__log, 'w')
         self.__logFH.write(argString + "\n\n")
@@ -77,7 +85,7 @@ class Snp():
         #fastq QC
         self.__fastqc          = "fastqc"
         self.__kraken          = "kraken"
-        self.__krakendb        = cfg['directories']['krakendb']
+        self.__krakendb        = krakendb
         self.__krakenreport    = "kraken-report"
         self.__pigz            = "pigz"
         self.__unpigz          = "unpigz"
@@ -107,7 +115,7 @@ class Snp():
         self.__del_parser      = "del_parse.py"
         self.mutationloci      = os.path.join(os.path.dirname(__file__), 'data', 'mutation_loci.txt')
         self.snplist           = os.path.join(os.path.dirname(__file__), 'data', 'snps.NC_000962.vcf')
-        self.__threads         = cfg['other']['threads']
+        self.__threads         = str(threads)
         
     """ Shell Execution Functions """
     def __CallCommand(self, program, command):
